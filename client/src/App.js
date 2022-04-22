@@ -1,37 +1,32 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
+import './App.css';
+import {BrowserRouter as Router,Routes,Route} from "react-router-dom";
+import Nav from "./Nav"
+import Health from './Component/Health';
+import HousePrice from './Component/HousePrice';
+import Home from './Component/Home';
+import Transport from './Component/Transport';
 
-function App(){
-
-  const [data,setData] = useState([{}])
-
-  useEffect( () =>{
-    fetch("/teamMember")
-    .then(
-      res => res.json()
-    )
-    .then(
-      data =>{
-        setData(data)
-        console.log(data)
-      }
-    )
-  },[])
+function App() {
 
 
   return (
-    <div>
-
-        {(typeof data.members === 'undefined') ? (
-          <p>Loading...</p>
-        ):(
-          data.members.map((member,i) => (
-            <p key={i}>{member}</p>
-          ))
-        )}
-
-      
+    
+    <div className="body">
+      <Router>
+        <Nav />
+        <Routes>
+          <Route path="/" element={<Home />}/>
+          <Route path="/Health" element={<Health />}/>
+          <Route path="/HousePrice" element={<HousePrice />}/>
+          <Route path="/Transport" element={<Transport />}/>
+        </Routes>   
+      </Router>
     </div>
+    
+
   );
-}
+  
+} 
 
 export default App;
