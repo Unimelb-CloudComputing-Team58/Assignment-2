@@ -1,0 +1,85 @@
+# Common vars
+availability_zone: melbourne-qh2-uom
+instance_image: 356ff1ed-5960-4ac2-96a1-0c0198e6a999
+instance_key_name: demo-joe
+instance_flavor: uom.mse.1c4g
+
+# Volume
+volumes:
+  - vol_name: instance-1-vol-data
+    vol_size: 50
+  - vol_name: instance-1-vol-docker
+    vol_size: 10
+  - vol_name: instance-2-vol-data
+    vol_size: 50
+  - vol_name: instance-2-vol-docker
+    vol_size: 10
+  - vol_name: instance-3-vol-data
+    vol_size: 50
+  - vol_name: instance-3-vol-docker
+    vol_size: 10
+  - vol_name: instance-4-vol-data
+    vol_size: 50
+  - vol_name: instance-4-vol-docker
+    vol_size: 10
+
+# Security group
+security_groups:
+  - name: instances-security-group
+    description: "security group for SSH or HTTP access"
+  - name: database-security-group
+    description: "communication within CouchDB cluster"
+
+
+security_group_rules_public: 
+  - name: instances-security-group
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+    remote_ip_prefix: 0.0.0.0/0
+  - name: instances-security-group
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+    remote_ip_prefix: 0.0.0.0/0
+  - name: instances-security-group
+    protocol: tcp
+    port_range_min: 65000
+    port_range_max: 65000
+    remote_ip_prefix: 0.0.0.0/0
+  - name: instances-security-group
+    protocol: tcp
+    port_range_min: 650
+    port_range_max: 650
+    remote_ip_prefix: 0.0.0.0/0
+
+  # CoucheDB
+  - name: database-security-group
+    protocol: tcp
+    port_range_min: 880
+    port_range_max: 880
+    remote_group: database-security-group
+  - name: database-security-group
+    protocol: tcp
+    port_range_min: 885
+    port_range_max: 885
+    remote_group: database-security-group
+  - name: database-security-group
+    protocol: tcp
+    port_range_min: 890
+    port_range_max: 890
+    remote_group: database-security-group
+
+
+# Instance
+instances:
+  - name: instance-1
+    volumes: ['instance-1-vol-data', 'instance-1-vol-docker']
+  - name: instances-2
+    volumes: ['instance-2-vol-data', 'instance-2-vol-docker']
+  - name: instance-3
+    volumes: ['instance-3-vol-data', 'instance-3-vol-docker']
+  - name: instances-4
+    volumes: ['instance-4-vol-data', 'instance-4-vol-docker']
+
+
