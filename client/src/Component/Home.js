@@ -9,21 +9,14 @@ function Home() {
   const {viewport, setViewport} = useState({
     longitude: 	144.946457,
     latitude: 	-37.840935,
-    zoom: 10,
-    width: '100vw',
-    height: '100vh'
+    zoom: 10
   })
 
   return (
     <div>
       <div className="twomaps">
         <Map
-          //defulat location 
-          initialViewState={{
-          longitude: 144.946457,
-          latitude: -37.840935,
-          zoom: 10  
-        }}
+          {...viewport}
           style={{width: '500px', height: '500px'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
@@ -32,11 +25,7 @@ function Home() {
       <div className="twomaps">
       <Map
           //defulat location 
-          initialViewState={{
-          longitude: 144.946457,
-          latitude: -37.840935,
-          zoom: 10  
-        }}
+          {...viewport}
           style={{width: '500px', height: '500px'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
