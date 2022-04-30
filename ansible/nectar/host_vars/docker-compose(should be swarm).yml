@@ -60,3 +60,15 @@ networks:
     ipam:
       config:
         - subnet: 172.20.0.0/16
+# Should be docker swarm 
+
+
+# By default, data inside Docker contianer won't be persisted when a container no longer exists 
+
+# Docker has two options for containers to store files on the host machine, so that the files are persisted even after the containter
+# stops 
+
+## Docker volumes (Managed by Docker, /var/lib/docker/volume/)
+## Bind mounts (Managed by user, any where on the file system)
+
+
