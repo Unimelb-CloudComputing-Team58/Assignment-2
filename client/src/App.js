@@ -2,8 +2,9 @@ import React from 'react';
 import './App.css';
 import {BrowserRouter as Router,Routes,Route} from "react-router-dom";
 import Nav from "./Nav"
-import Health from './Component/Health';
+import Food from './Component/Food';
 import Home from './Component/Home';
+import Park from './Component/Park';
 
 function App() {
 
@@ -15,7 +16,8 @@ function App() {
         <Nav />
         <Routes>
           <Route path="/" element={<Home />}/>
-          <Route path="/Health" element={<Health />}/>
+          <Route path="/Health" element={<Food />}/>
+          <Route path="/Health" element={<Park />}/>
         </Routes>   
       </Router>
     </div>

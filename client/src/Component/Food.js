@@ -2,9 +2,10 @@ import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Map, { Source, Layer } from "react-map-gl";
+import { BarChart, Bar, XAxis, YAxis, Legend } from 'recharts';
 import '../App.css';
 
-function Health() {
+function Food() {
 
   const {viewport, setViewport} = React.useState({
     longitude: 	144.946457,
@@ -80,4 +81,4 @@ function Health() {
   
 } 
 
-export default Health;
+export default Food;

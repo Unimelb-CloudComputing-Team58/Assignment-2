@@ -1,0 +1,12 @@
+version: "3"
+services:    
+      flask-server:
+        image: "flaskdemo"
+        port: 
+          - "5000:5000"
+
+      react-app:
+        image: "reactdemo/latest"
+        port:
+          - "3000:3000"
+        depond_on: "flask-server"

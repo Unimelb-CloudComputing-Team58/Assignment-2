@@ -13,7 +13,8 @@ function Nav() {
       </div>
       <div className="inline-buttons">
           <Link to="/"><Button variant="primary">Home</Button></Link>
-          <Link to="/Health"><Button variant="primary">Health</Button></Link>
+          <Link to="/"><Button variant="primary">Food</Button></Link>
+          <Link to="/Health"><Button variant="primary">Park</Button></Link>
       </div>
     </div>
   );
