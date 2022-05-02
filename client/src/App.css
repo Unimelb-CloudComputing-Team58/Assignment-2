@@ -23,12 +23,25 @@ body {
 }
 
 .inline-buttons Button {
-  margin: 20px;
+  margin-left: 50px;
+  margin-right: 50px;
 }
 
-.twomaps {
+.component {
+  height: 950px;
+}
+
+.chart-container {
+  margin-top: 80px;
+  text-align: center;
+}
+
+.charts {
   display: inline-block;
+}
+.twomaps {
   border: 5px solid cornflowerblue;
   margin-top: 80px;
-  margin-left: 120px;
+  margin-left: 140px;
+  margin-right: 169px;
 }

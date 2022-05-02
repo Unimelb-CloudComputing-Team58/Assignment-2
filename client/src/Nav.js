@@ -14,8 +14,6 @@ function Nav() {
       <div className="inline-buttons">
           <Link to="/"><Button variant="primary">Home</Button></Link>
           <Link to="/Health"><Button variant="primary">Health</Button></Link>
-          <Link to="/HousePrice"><Button variant="primary">House Price</Button></Link>
-          <Link to="/Transport"><Button variant="primary">Transport</Button></Link>
       </div>
     </div>
   );

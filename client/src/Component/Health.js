@@ -12,11 +12,18 @@ function Health() {
     zoom: 10
   })
 
-  useEffect(async () => {
-    const response = await fetch('/health')
-    const healthJson = await response.json()  
+  //const [tweetSize, setTweetSize] = useState([])
+  //const [emotionAnalysis, seEmotionAnalysis] = useState([])
+  //const [feature, setFeture] = useState([])
+
+
+
+  //   useEffect(async () => {
+  //   const response = await fetch('/numberoftweet')
+  //   const healthJson = await response.json()  
     
-  },[]);
+  // },[]);
+
 
   const geojson = {
     type: 'FeatureCollection',
@@ -37,11 +44,29 @@ function Health() {
  
 
   return (
-    <div>
+    <div className="component">
+        <div className="charts">
+        <BarChart width={500} height={300} data={tweetSize}>
+          <XAxis dataKey="name" />
+          <YAxis dataKey="tweetSize" />
+          <Legend verticalAlign="top" height={36} />
+          <Bar name="tweet size" dataKey="tweetSize" barSize={30} fill="#4D5B7F"
+           />
+        </BarChart>
+      </div>
+      <div className="charts">
+        <BarChart width={500} height={300} data={NLP}>
+          <XAxis dataKey="name" />
+          <YAxis dataKey="poportion" />
+          <Legend verticalAlign="top" height={36} />
+          <Bar name="emotional analysis" dataKey="poportion" barSize={30} fill="#616A6B"
+           />
+        </BarChart>
+      </div>
       <div className="twomaps">
         <Map
           {...viewport}
-          style={{width: '500px', height: '500px'}}
+          style={{width: '1100px', height: '500px'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
         >
@@ -49,14 +74,6 @@ function Health() {
         <Layer {...layerStyle} />
       </Source>
         </Map>
-      </div>
-      <div className="twomaps">
-      <Map
-          {...viewport}
-          style={{width: '500px', height: '500px'}}
-          mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
-          mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
-        />
       </div>
     </div>
   );
