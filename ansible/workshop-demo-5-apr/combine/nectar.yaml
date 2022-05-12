@@ -1,0 +1,59 @@
+- hosts: localhost
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
+
+  roles:
+    #- role: openstack-common
+    #- role: openstack-images
+    # - role: openstack-volume
+    - role: openstack-security-group
+    - role: openstack-instance
+    #- role: openstack-volume-snapshot
+  
+- hosts: master, workers 
+  vars_files:
+    - host_vars/wordpress.yaml
+  gather_facts: false
+  vars:
+    - ansible_user: ubuntu
+    - ansible_ssh_private_key_file: ./id_sam.pem
+    - ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+  roles:
+    # - role: common
+    # - role: volumes
+    # - role: docker
+    # - role: wordpress
+
+- hosts: master
+  become: true
+  vars:
+    - ansible_user: ubuntu
+    - ansible_ssh_private_key_file: ./id_sam.pem
+    - ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+  - name: init swarm
+    community.docker.docker_swarm:
+      state: present
+    register: swarm_info
+  
+- hosts: workers
+  become: true
+  vars:
+    - ansible_user: ubuntu
+    - ansible_ssh_private_key_file: ./id_sam.pem
+    - ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  tasks:
+  - name: join swarm
+    community.docker.docker_swarm:
+      state: join
+      join_token: "{{ hostvars['workers'].swarm_info.swarm_facts.JoinTokens.Worker }}"
+      remote_addrs: "{{item}}:2377"
+    register: join_result
+    loop: "{{groups['master']}}"
+  
+  - name: inspect
+    debug: 
+      var: join_result
+
