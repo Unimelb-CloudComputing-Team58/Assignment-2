@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Map, { Source, Layer } from "react-map-gl";
-import { BarChart, Bar, XAxis, YAxis, Legend } from 'recharts';
+import { CartesianGrid,BarChart, Bar, XAxis, YAxis, Legend, Tooltip } from 'recharts';
+import ReactLoading from 'react-loading';
 import '../App.css';
-
 
 function Park() {
 
@@ -15,90 +15,111 @@ function Park() {
   })
 
 
-  //const [tweetSize, setTweetSize] = useState([])
-  //const [emotionAnalysis, seEmotionAnalysis] = useState([])
-  //const [feature, setFeture] = useState([])
+  const [rawdata, setRawData] = useState()
+  const [loading, setLoading] = useState(true)
 
 
+    useEffect( () => {
 
-  //   useEffect(async () => {
-  //   const response = await fetch('/numberoftweet')
-  //   const healthJson = await response.json()  
+       fetch('/park')
+       .then(response => response.json())
+       .then(data => {
+         setRawData(data.results)
+         setLoading(false)   
+       })
+      
     
-  // },[]);
+    },[]);
 
-
-  //tweetSize
-  const tweetSize  = [
-    {
-      name: 'city',
-      tweetSize: 4000,
-    },
-    {
-      name: 'beach',
-      tweetSize: 3000,
-    },
-    {
-      name: 'airport',
-      tweetSize: 2000,
-    }
-  ];
-
-
-    //tweetsAnalysis
-    const NLP = [
-      {
-        name: 'Positive',
-        poportion: 80,
-      },
-      {
-        name: 'Negative',
-        poportion: 20,
-      }
-    ];
-
-
-  //mapbox
-  const geojson = {
-    type: 'FeatureCollection',
-    features: [
-      {type: 'Feature', geometry: {type: 'Point', coordinates: [144.946457, -37.840935]}},
-      {type: 'Feature', geometry: {type: 'Point', coordinates: [144.926457, -37.840935]}}
-    ]
-  };
-
+  
   const layerStyle = {
     id:   'Point',
     type: 'circle',
     paint: {
-      'circle-radius': 5,
+      'circle-radius': 1,
       'circle-color': '#00BFFF'
     }
   };
  
 
+  if(loading){
+    return (
+      <div className="loading">
+          <ReactLoading type={"spin"} color={"#ffffff"} height={65} width={300} />
+      </div>
+    )
+  }
+  else{ 
+    const geojson = {
+      type: 'FeatureCollection',
+      features: []
+    };
+    rawdata.coordinates.forEach(element => {
+      geojson.features.push({type: 'Feature', geometry: {type: 'Point', coordinates: element}})
+    }); 
+    console.log(geojson)
+
   return (
+
     <div className="component">
       <div className="chart-container">
+        <div className="charts">
+        <BarChart width={500} height={300} data={rawdata.num_tweets}>
+        <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
+          <XAxis dataKey="area" fontSize="14"/>
+          <YAxis dataKey="num_tweets" />
+          <Tooltip cursor={false}/>
+          <Legend verticalAlign="top" height={40} />
+          <Bar name="tweet count" dataKey="num_tweets" barSize={30} fill="#7B69D9"/>
+
+        </BarChart>
+      </div>
       <div className="charts">
-        <BarChart width={500} height={300} data={tweetSize}>
+      <BarChart
+          width={500}
+          height={300}
+          data={rawdata.sentiements}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
+        >
+          <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
+          <XAxis dataKey="area" fontSize="14"/>
+          <YAxis />
+          <Legend verticalAlign="top" height={40}/>
+          <Tooltip cursor={false}/>
+          <Bar dataKey="num_positive" fill="#2D6BCF" />
+          <Bar dataKey="num_negative" fill="#EC4817" />
+        </BarChart>
+      </div>
+
+
+
+      </div>
+      <div className="chart-container">
+        <div className="charts">
+        <BarChart width={500} height={300} data={rawdata}>
           <XAxis dataKey="name" />
           <YAxis dataKey="tweetSize" />
           <Legend verticalAlign="top" height={36} />
-          <Bar name="tweet size" dataKey="tweetSize" barSize={30} fill="#4D5B7F"
+          <Bar name="Median household income vs. SA4" dataKey="tweetSize" barSize={30} fill="#4D5B7F"
            />
         </BarChart>
       </div>
       <div className="charts">
-        <BarChart width={500} height={300} data={NLP}>
+        <BarChart width={500} height={300} data={rawdata}>
           <XAxis dataKey="name" />
           <YAxis dataKey="poportion" />
           <Legend verticalAlign="top" height={36} />
-          <Bar name="emotional analysis" dataKey="poportion" barSize={30} fill="#616A6B"
-           />
+          <Bar name="Happiness vs. income" dataKey="poportion" barSize={30} fill="#616A6B"/>
+          <Bar name="tweet count" dataKey="tweetSize" barSize={30} fill="#4D5B7F"/>
         </BarChart>
       </div>
       </div>
+
       <div className="twomaps">
         <Map
           {...viewport}
@@ -113,6 +134,8 @@ function Park() {
       </div>
     </div>
   );
+  }
+  
   
 } 
 

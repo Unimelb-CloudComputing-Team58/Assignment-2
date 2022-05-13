@@ -1,0 +1,6 @@
+couchdb
+textblob
+nltk
+pyshp
+pandas
+tweepy

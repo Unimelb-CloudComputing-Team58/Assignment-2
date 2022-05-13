@@ -1,6 +1,9 @@
 # pull official base image
 FROM node:13.12.0-alpine
 
+
+COPY . /app
+
 # set working directory
 WORKDIR /app
 
@@ -14,6 +17,8 @@ RUN npm install --legacy-peer-deps
 
 # add app
 COPY . ./
+
+EXPOSE 3000
 
 # start app
 CMD ["npm", "start"]

@@ -1,10 +1,12 @@
 
-FROM python:3.8-slim-buster
+FROM python:3
+
+COPY . /app
 
 WORKDIR /app
 
-RUN pip3 install 
+RUN ["pip3", "install", "-r", "requirements.txt"]
 
-COPY . .
+EXPOSE 5000
 
-CMD [ "python3", "server.py"]
+CMD [ "python3", "venv/server.py"]

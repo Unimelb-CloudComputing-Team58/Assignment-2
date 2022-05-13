@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, abort, request, make_response, url_for
+from flask import Flask, jsonify, abort, request, make_response, url_for, Response
 import couchdb
 couch = couchdb.Server("http://admin:admin@172.26.130.202:5984")
 db = couch['twitter']
@@ -56,4 +56,4 @@ def get_food():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5001,debug=True)
