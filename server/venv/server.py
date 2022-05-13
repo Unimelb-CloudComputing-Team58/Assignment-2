@@ -1,12 +1,8 @@
 from flask import Flask, jsonify, abort, request, make_response, url_for, Response
 import couchdb
 couch = couchdb.Server("http://admin:admin@172.26.130.202:5984")
-<<<<<<< HEAD
 db = couch['twitter']
 from flask_cors import CORS
-=======
-
->>>>>>> d376c9faafe0a5beb671955b4b558af6386b0bdd
 app = Flask(__name__, static_url_path="")
 CORS(app)
 
@@ -112,8 +108,4 @@ def get_food():
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(debug=True, host='0.0.0.0')
-=======
-    app.run(host="0.0.0.0", port=5000,debug=True)
->>>>>>> d376c9faafe0a5beb671955b4b558af6386b0bdd
