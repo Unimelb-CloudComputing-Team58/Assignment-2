@@ -1,0 +1,107 @@
+# Common vars
+availability_zone: melbourne-qh2-uom
+instance_image: 356ff1ed-5960-4ac2-96a1-0c0198e6a999
+instance_key_name: id_sam
+instance_flavor: uom.mse.2c9g
+
+# Volume
+volumes:
+  - vol_name: docker-vol-0
+    vol_size: 5
+  - vol_name: docker-vol-1
+    vol_size: 5
+  - vol_name: docker-vol-2
+    vol_size: 5
+  - vol_name: docker-vol-3
+    vol_size: 5
+  - vol_name: data-vol-0
+    vol_size: 5
+  - vol_name: data-vol-1
+    vol_size: 5
+  - vol_name: data-vol-2
+    vol_size: 5
+  - vol_name: data-vol-3
+    vol_size: 5
+
+
+# Instance
+instances:
+  - name: i0
+    volumes: [docker-vol-0, data-vol-0]
+  - name: i1
+    volumes: [docker-vol-1, data-vol-1]
+  - name: i2
+    volumes: [docker-vol-2, data-vol-2]
+  - name: i3
+    volumes: [docker-vol-3, data-vol-3]
+
+# Security group
+security_groups:
+  - name: sg-admin
+    description: "Security group to allow for SSH, HTTP or front end access"
+  - name: sg-couch-db
+    description: "Security group for communication between CouchDB nodes in cluster"
+  - name: sg-docker-swarm
+    description: "Security group for docker swarm"
+
+security_group_rules_public:
+  - name: sg-admin
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+    remote_ip_prefix: 0.0.0.0/0
+  - name: sg-admin
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+    remote_ip_prefix: 0.0.0.0/0
+  - name: sg-admin
+    protocol: tcp
+    port_range_min: 5984
+    port_range_max: 5984
+    remote_ip_prefix: 0.0.0.0/0
+  - name: sg-admin
+    protocol: tcp
+    port_range_min: 10000
+    port_range_max: 10000
+    remote_ip_prefix: 0.0.0.0/0
+
+# security groups for CoucheDB 
+security_group_rules_private: 
+  - name: sg-couch-db
+    protocol: tcp
+    port_range_min: 5984
+    port_range_max: 5984
+    remote_group: sg-couch-db
+  - name: sg-couch-db
+    protocol: tcp
+    port_range_min: 4369
+    port_range_max: 4369
+    remote_group: sg-couch-db
+  - name: sg-couch-db
+    protocol: tcp
+    port_range_min: 9100
+    port_range_max: 9200
+    remote_group: sg-couch-db
+  
+  # docker swarm
+  - name: sg-docker-swarm
+    protocol: tcp
+    port_range_min: 2377
+    port_range_max: 2377
+    remote_group: sg-docker-swarm
+  - name: sg-docker-swarm
+    protocol: tcp
+    port_range_min: 7496
+    port_range_max: 7496
+    remote_group: sg-docker-swarm
+  - name: sg-docker-swarm
+    protocol: udp
+    port_range_min: 7496
+    port_range_max: 7496
+    remote_group: sg-docker-swarm
+  - name: sg-docker-swarm
+    protocol: udp
+    port_range_min: 4789
+    port_range_max: 4789
+    remote_group: sg-docker-swarm

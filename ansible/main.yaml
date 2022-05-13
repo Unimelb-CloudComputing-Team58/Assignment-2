@@ -1,0 +1,36 @@
+---
+- hosts: localhost
+  vars_files:
+    - host_vars/openstack.yaml
+  roles:
+    # - role: localhost-common
+    # - role: openstack-volume
+    - role: openstack-security-group
+    - role: openstack-instance
+
+
+- hosts: leader, manager, worker
+  vars_files:
+    - host_vars/mrc.yaml
+  roles:
+    - role: mrc-common
+    - role: mrc-volumes
+    - role: mrc-docker
+
+
+- name: set up swarm
+  import_playbook: pb-swarm.yaml
+
+
+- hosts: couchdb_coordinator, couchdb_nodes
+  vars_files:
+    - host_vars/mrc.yaml
+  roles:
+    - role: couchdb-setup
+
+
+- hosts: couchdb_nodes
+  vars_files:
+    - host_vars/mrc.yaml
+  roles:
+    - role: couchdb-cluster

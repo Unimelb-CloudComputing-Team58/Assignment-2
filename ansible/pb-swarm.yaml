@@ -1,0 +1,39 @@
+---
+- hosts: swarm_leader
+  become: true
+  vars_files:
+    - host_vars/mrc.yaml
+  tasks:
+    - name: init swarm
+      community.docker.docker_swarm:
+        state: present
+      register: swarm_info
+    - name: retrieve swarm tokens
+      ansible.builtin.set_fact:
+        manager_token: "{{ swarm_info.swarm_facts.JoinTokens.Manager }}"
+        worker_token: "{{ swarm_info.swarm_facts.JoinTokens.Worker }}"
+
+
+- hosts: swarm_manager
+  become: true
+  vars_files:
+    - host_vars/mrc.yaml
+  tasks:
+    - name: add managers to swarm
+      community.docker.docker_swarm:
+        state: join
+        join_token: "{{ hostvars[ swarm_leader ]['manager_token'] }}"
+        remote_addrs: "{{ swarm_leader }}:2377"
+      # loop: "{{ groups['swarm_leader'] }}"
+
+
+- hosts: swarm_worker
+  become: true
+  vars_files:
+    - host_vars/mrc.yaml
+  tasks:
+    - name: add workers to swarm
+      community.docker.docker_swarm:
+        state: join
+        join_token: "{{ hostvars[ swarm_leader ]['worker_token'] }}"
+        remote_addrs: "{{ swarm_leader }}:2377"

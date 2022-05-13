@@ -1,0 +1,6 @@
+---
+couchdb_version: 3.2.2
+couchdb_user: admin
+couchdb_password: admin
+couchdb_secret: secret
+couchdb_erlang_cookie: a192aeb9904e6590849337933b000c99
