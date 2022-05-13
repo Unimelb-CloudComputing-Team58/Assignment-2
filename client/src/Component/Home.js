@@ -8,7 +8,10 @@ function Home() {
 
 
   return (
-    <h1>welcome</h1>
+    <div className="homecomponent">
+      <h1>welcome</h1>
+    </div>
+
   );
   
 } 

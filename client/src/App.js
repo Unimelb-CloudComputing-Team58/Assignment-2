@@ -5,6 +5,7 @@ import Nav from "./Nav"
 import Food from './Component/Food';
 import Home from './Component/Home';
 import Park from './Component/Park';
+import Test from './Component/Test';
 
 function App() {
 
@@ -16,8 +17,9 @@ function App() {
         <Nav />
         <Routes>
           <Route path="/" element={<Home />}/>
-          <Route path="/Health" element={<Food />}/>
-          <Route path="/Health" element={<Park />}/>
+          <Route path="/Food" element={<Food />}/>
+          <Route path="/Park" element={<Park />}/>
+          <Route path="/Test" element={<Test />}/>
         </Routes>   
       </Router>
     </div>
