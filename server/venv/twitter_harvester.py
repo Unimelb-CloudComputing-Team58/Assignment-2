@@ -3,9 +3,90 @@ import time
 from dotenv import load_dotenv
 from tweepy import API, OAuth2BearerHandler
 from tweepy import Stream, Cursor
+import pickle
 import _thread
 import json
 import threading
+from textblob import TextBlob
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import json
+import pandas as pd
+import shapefile
+from shapely.geometry import Point  # Point class
+from shapely.geometry import shape  # shape() is a function to convert geo objects through the interface
+import couchdb
+import numpy as np
+
+#importing the module
+import logging
+
+# #now we will Create and configure logger
+# logging.basicConfig(filename="std.log",
+# 					format='%(asctime)s %(message)s',
+# 					filemode='w')
+#
+# #Let us Create an object
+# logger=logging.getLogger()
+#
+# #Now we are going to Set the threshold of logger to DEBUG
+# logger.setLevel(logging.DEBUG)
+
+
+nltk.download('vader_lexicon')
+SHAPE_FILE_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\Assignment-2\aurin_data\shp_files\spatialise-median-house-price\shp\apm_sa4_2016_timeseries-.shp'
+TWEET_DATA_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\full_data\food.json'
+SERVER_PATH = 'http://admin:admin@127.0.0.1:5984'
+DB_NAME = 'catch'
+tweets_list = []
+threads = []
+
+def CouchDB(SERVER_PATH, DB_NAME, data_list):
+    couch = couchdb.Server(SERVER_PATH)
+    if DB_NAME in couch:
+        db = couch[DB_NAME]
+    else:
+        db = couch.create(DB_NAME)
+
+    for data in data_list:
+        db.save(data)
+
+
+def process_tweet(tweet_list):
+    shp = shapefile.Reader(SHAPE_FILE_PATH)  # open the shapefile
+    all_shapes = shp.shapes()  # get all the polygons
+    all_records = shp.records()
+    data_list = []
+    counter = 0
+    for line in tweet_list:
+        counter += 1
+        if counter % 1000 == 0:
+            print("Finish: ", counter)
+        j = line
+        text = j['text']
+        analysis = TextBlob(text)
+        score = SentimentIntensityAnalyzer().polarity_scores(text)
+        neg = score['neg']
+        neu = score['neu']
+        pos = score['pos']
+        sentiment_result = ''
+        if neg > pos:
+            sentiment_result = 'NEGATIVE'
+        elif pos > neg:
+            sentiment_result = 'POSITIVE'
+        else:
+            sentiment_result = 'NEUTRAL'
+
+        point_to_check = (j['coordinates']['coordinates'][0], j['coordinates']['coordinates'][1])
+        for i in range(len(all_shapes)):
+            boundary = all_shapes[i]  # get a boundary polygon
+            if Point(point_to_check).within(shape(boundary)):  # make a point and see if it's in the polygon
+                name = all_records[i][4]
+                data = {'id': j['id'], 'text': j['text'],
+                        'coordinate': j['coordinates']['coordinates'], 'area': name,
+                        'sentiment': sentiment_result, 'polarity': analysis.sentiment.polarity}
+                data_list.append(data)
+    return data_list
 
 
 def processTweet(tweet):
@@ -44,7 +125,7 @@ auth2 = OAuth2BearerHandler(bearer_token2)
 api2 = API(auth2)
 
 lock = threading.Lock()
-tweets = []
+
 threads = []
 query_string = "food OR restaurant"
 # query_string = "covid-19 OR coronavirus OR #covid-19 OR #coronavirus"
@@ -67,38 +148,41 @@ def search_recent():
     resps = []
     # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/overview
     # for i in range(2):
-    for i in range(1):
-
+    print("get in search_recent")
+    i = 1
+    while(i):
+        print("i th search", i)
+        i += 1
         resp = api.search_tweets(q=query_string, count=max_results, geocode="-37.81585,144.96313,150km")
+        lock.acquire()
         with open("test.json", 'w') as f:
             for i, tweet in enumerate(resp):
                 if tweet.coordinates is not None:
-                    resps.append(processTweet(tweet))
+                    # resps.append(processTweet(tweet))
                     num_geo_tweets += 1
-                jsonStr = json.dumps(tweet._json)
-                f.write(jsonStr + "\n")
-
+                    tweets_list.append(json.dumps(tweet._json))
+            lock.release()
             while (len(resp) > 0):
+                print("count", counter)
+                print(len(resp))
                 max_id = resp[-1].id - 1
                 resp = api.search_tweets(q=query_string, count=max_results, geocode="-37.81585,144.96313,150km",
                                          max_id=max_id)
-
+                lock.acquire()
                 counter += 1
                 for tweet in resp:
                     if tweet.coordinates is not None:
-                        resps.append(processTweet(tweet))
+                        tweets_list.append(json.dumps(tweet._json))
                         num_geo_tweets += 1
                     # json.dumps(tweet._json, f, indent=2)
-                    jsonStr = json.dumps(tweet._json)
-                    f.write(jsonStr + "\n")
+                lock.release()
                 if (counter == limit):
                     print("sleep")
                     print(num_geo_tweets)
                     print(len(resps))
                     print(len(set(resps)))
                     time.sleep(15 * 60)
-    # print(len(resps))
-    # print(len(set(resps)))
+
     print(resps)
     print(num_geo_tweets)
 
@@ -143,7 +227,7 @@ def search_30():
             lock.acquire()
             for tweet in page:
                 if tweet.coordinates is not None:
-                    tweets.append(tweet)
+                    tweets_list.append(tweet)
                     # print(tweet.created_at, tweet.text, tweet.coordinates)
             lock.release()
             if counter == limit:
@@ -151,6 +235,45 @@ def search_30():
                 time.sleep(60)
     except:
         print("requests exceed monthly maximum limit")
+
+
+def check():
+    global tweets_list
+    check_num = 0
+    dic_file = 'index_checking.pkl'
+
+    while 1:
+        lock.acquire()
+        if len(tweets_list) == 0:
+            print("sleep")
+            lock.release()
+            time.sleep(30)
+        else:
+            print("start check", check_num)
+            if os.path.exists(dic_file):
+                a_file = open(dic_file, "rb")
+                index_dic = pickle.load(a_file)
+                a_file.close()
+
+            else:
+                index_dic = {}
+            check_num += 1
+            process_tweet_list = []
+            for tweet in tweets_list:
+                tweet = json.loads(tweet)
+                if tweet['coordinates'] is not None:
+                    if tweet['id'] not in index_dic:
+                        process_tweet_list.append(tweet)
+                        index_dic[tweet['id']] = 0
+
+            a_file = open(dic_file, "wb")
+            pickle.dump(index_dic, a_file)
+            a_file.close()
+            tweets_list = []
+            lock.release()
+            CouchDB(SERVER_PATH, DB_NAME, process_tweet(process_tweet_list))
+
+            print("end checking")
 
 
 def search_full(bearerToken, label, fromDate, toDate):
@@ -171,7 +294,7 @@ def search_full(bearerToken, label, fromDate, toDate):
             lock.acquire()
             for tweet in page:
                 if tweet.coordinates is not None:
-                    tweets.append(tweet)
+                    tweets_list.append(tweet)
             lock.release()
             if counter == limit:
                 print("requests exceed minute limit")
@@ -186,40 +309,38 @@ bearer_tokens = ["TWITTER_BEARER_TOKEN", "TWITTER_BEARER_TOKEN2", "TWITTER_BEARE
 labels = ["devfull", "devleo"]
 fromDates = ["202104080000", "202004080000", "201904080000", "201804080000", "201704080000"]
 toDates = ["202204080000", "202104070000", "202004070000""201904070000", "201804070000"]
-try:
-    t0 = threading.Thread(target=search_recent)  # 7 days
-    t1 = threading.Thread(target=search_30)
-    t2 = threading.Thread(target=stream)
-    threads.append(t0)
-    threads.append(t1)
-    threads.append(t2)
-    t0.start()
-    t1.start()
-    t2.start()
-    for i in range(5):
-        t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDates[i], toDates[i]])
-        threads.append(t)
-        t.start()
-    [thread.join() for thread in threads]
-    with open("food.js", "a+") as f:
-        for tweet in tweets:
-            jsonStr = json.dumps(tweet._json)
-            f.write(jsonStr + "\n")
-        f.close()
 
-    # _thread.start_new_thread( search_recent, () )
-    # _thread.start_new_thread(search_30, ())
-    # for i in range(4):
-    #     _thread.start_new_thread(bearer_tokens[i], search_full, (labels[i], fromDates[i], toDates[i]))
-
-    # _thread.start_new_thread( stream, () )
-except:
-    print("Error: unable to start thread")
-
-while 1:
-    pass
+if __name__ == "__main__":
+    try:
+        print("start")
+        t0 = threading.Thread(target=search_recent)  # 7 days
+        # t1 = threading.Thread(target=search_30)
+        # t2 = threading.Thread(target=stream)
+        t3 = threading.Thread(target=check)
+        threads.append(t0)
+        # threads.append(t1)
+        # threads.append(t2)
+        threads.append(t3)
+        t0.start()
+        # t1.start()
+        # t2.start()
+        t3.start()
+        # for i in range(5):
+        #      t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDates[i], toDates[i]])
+        #      threads.append(t)
+        #      t.start()
+        [thread.join() for thread in threads]
+        # tweets_list = []
+        # with open("food.js", "a+") as f:
+        #     for tweet in tweets:
+        #         jsonStr = json.dumps(tweet._json)
+        #         tweets_list.append(tweet._json)
+        #         f.write(jsonStr + "\n")
+        #
 
 
+    except:
+        print("Error: unable to start thread")
 
-
-
+    while 1:
+        pass
