@@ -1,8 +1,12 @@
 from flask import Flask, jsonify, abort, request, make_response, url_for, Response
 import couchdb
 couch = couchdb.Server("http://admin:admin@172.26.130.202:5984")
+<<<<<<< HEAD
 db = couch['twitter']
 from flask_cors import CORS
+=======
+
+>>>>>>> d376c9faafe0a5beb671955b4b558af6386b0bdd
 app = Flask(__name__, static_url_path="")
 CORS(app)
 
@@ -25,6 +29,48 @@ def test():
 
 @app.route('/food', methods=['GET'])
 def get_food():
+    db = couch['twitter_food']
+    results1 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=1)
+    results2 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=2)
+    results3 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=3)
+    result = {}
+    tweets_results = []
+    for r in results1:
+        dic = {}
+        dic["area"] = r.key[0]
+        dic["num_tweets"] = r.value
+        tweets_results.append(dic)
+    print(tweets_results)
+    sentiments = []
+    areas = ["Melbourne - Inner", "Melbourne - Inner East", "Melbourne - Inner South","Melbourne - North East","Melbourne - North West",
+             "Melbourne - Outer East","Melbourne - South East","Melbourne - West","Mornington Peninsula"]
+    print('\n')
+    for area in areas:
+        dic = {}
+        dic["area"] = area
+        dic["num_positive"] = 0
+        dic["num_negative"] = 0
+        sentiments.append(dic)
+    for r in results2:
+        for s in sentiments:
+
+            if r.key[0] == s["area"]:
+                if r.key[1] == "POSITIVE":
+                    s["num_positive"] = r.value
+                else:
+                    s["num_negative"] = r.value
+
+    coordinates = []
+    for r in results3:
+        coordinates.append(r.key[2])
+    result['num_tweets'] = tweets_results
+    result['sentiements'] = sentiments
+    result['coordinates'] = coordinates
+    return jsonify({'results': result})
+
+@app.route('/food', methods=['GET'])
+def get_food():
+    db = couch['twitter_park']
     results1 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=1)
     results2 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=2)
     results3 = db.view('area_sentiement/get_area_sentiement', reduce=True, group_level=3)
@@ -66,4 +112,8 @@ def get_food():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(debug=True, host='0.0.0.0')
+=======
+    app.run(host="0.0.0.0", port=5000,debug=True)
+>>>>>>> d376c9faafe0a5beb671955b4b558af6386b0bdd

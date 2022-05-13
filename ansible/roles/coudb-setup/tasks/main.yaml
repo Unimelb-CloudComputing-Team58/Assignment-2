@@ -1,0 +1,21 @@
+---
+- name: Create and start CouchDB Docker container
+  become: true
+  docker_container:
+    name: couchdb
+    image: "apache/couchdb:{{ COUCHDB_VERSION }}"
+    state: started
+    recreate: true
+    ports:
+      - "5984:5984"
+      - "4369:4369"
+      - "9100-9200:9100-9200"
+    mounts:
+      - type: bind
+        source: /data 
+        target: /opt/couchdb/data
+    env:
+      COUCHDB_USER: "{{ couchdb_user }}"
+      COUCHDB_PASSWORD: "{{ couchdb_password }}"
+      COUCHDB_ERLANG_COOKIE: "{{ couchdb_erlang_cookie }}"
+      COUCHDB_SECRET: "{{ couchdb_secret }}"

@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 from tweepy import API, OAuth2BearerHandler
 from tweepy import Stream, Cursor
 import pickle
-import _thread
 import json
 import threading
 from textblob import TextBlob
@@ -17,6 +16,20 @@ from shapely.geometry import Point  # Point class
 from shapely.geometry import shape  # shape() is a function to convert geo objects through the interface
 import couchdb
 import numpy as np
+import sys
+
+args = sys.argv
+query_topic = None
+area = None
+
+if len(args) < 3:
+    print("Usage: python ./twitter_harvester <Area> <Topic>")
+    exit()
+else:
+    query_topic = args[2]
+    area = args[1]
+print(args)
+print(query_topic,area)
 
 #importing the module
 import logging
@@ -40,6 +53,25 @@ SERVER_PATH = 'http://admin:admin@127.0.0.1:5984'
 DB_NAME = 'catch'
 tweets_list = []
 threads = []
+
+load_dotenv()
+bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
+if not bearer_token:
+    raise RuntimeError("Not found bearer token")
+
+auth = OAuth2BearerHandler(bearer_token)
+api = API(auth)
+lock = threading.Lock()
+threads = []
+
+
+query_string = "food OR restaurant OR breakfast OR lunch OR dinner OR cook OR cafe"
+# query_string = "covid-19 OR coronavirus OR #covid-19 OR #coronavirus"
+# query_string = "market OR supermarket"
+# query_string = "park"
+# query_string = "melbournemoney OR #melbournemoney"
+query_string = "*"
+max_id = None
 
 def CouchDB(SERVER_PATH, DB_NAME, data_list):
     couch = couchdb.Server(SERVER_PATH)
@@ -89,7 +121,7 @@ def process_tweet(tweet_list):
     return data_list
 
 
-def processTweet(tweet):
+def getFullText(tweet):
     if tweet.is_quote_status is True and not tweet.text.startswith("RT"):
         if 'extended_tweet' in tweet._json['retweeted_status']:
             full_text = tweet._json['retweeted_status']['extended_tweet']['full_text']
@@ -109,32 +141,6 @@ def processTweet(tweet):
     return {"coordinates": tweet.coordinates['coordinates'], "text": full_text}
 
 
-load_dotenv()
-bearer_token = os.getenv("TWITTER_BEARER_TOKEN")
-if not bearer_token:
-    raise RuntimeError("Not found bearer token")
-
-auth = OAuth2BearerHandler(bearer_token)
-api = API(auth)
-
-bearer_token2 = os.getenv("TWITTER_BEARER_TOKEN2")
-if not bearer_token2:
-    raise RuntimeError("Not found bearer token")
-
-auth2 = OAuth2BearerHandler(bearer_token2)
-api2 = API(auth2)
-
-lock = threading.Lock()
-
-threads = []
-query_string = "food OR restaurant"
-# query_string = "covid-19 OR coronavirus OR #covid-19 OR #coronavirus"
-# query_string = "market OR supermarket"
-# query_string = "park"
-# query_string = "melbournemoney OR #melbournemoney"
-query_string = "*"
-max_id = None
-
 """
 search recent 7 days tweets api v1.1
 """
@@ -153,7 +159,7 @@ def search_recent():
     while(i):
         print("i th search", i)
         i += 1
-        resp = api.search_tweets(q=query_string, count=max_results, geocode="-37.81585,144.96313,150km")
+        resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km")
         lock.acquire()
         with open("test.json", 'w') as f:
             for i, tweet in enumerate(resp):
@@ -166,7 +172,7 @@ def search_recent():
                 print("count", counter)
                 print(len(resp))
                 max_id = resp[-1].id - 1
-                resp = api.search_tweets(q=query_string, count=max_results, geocode="-37.81585,144.96313,150km",
+                resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
                                          max_id=max_id)
                 lock.acquire()
                 counter += 1
@@ -195,10 +201,9 @@ Stream
 class TweetListener(Stream):
 
     def on_status(self, status):
-        # print(status.id)
-        print(status.text)
-        # print(status.user.id)
-        # print(api.user_timeline(user_id=status.user.id))
+        print(status._json)
+        if status.coordinates is not None:
+            tweets_list.append(json.dumps(status._json))
 
     def on_request_error(self, status_code):
         print(status_code)
@@ -214,15 +219,15 @@ tweetListener = TweetListener(
 
 
 def stream():
-    tweetListener.filter(track=["food OR restaurant"], locations=[144.3336, -38.5030, 145.8784, -37.1751])
+    tweetListener.filter(track=["{topic}".format(topic=query_topic)], locations=[144.3336, -38.5030, 145.8784, -37.1751])
 
 
 def search_30():
     limit = 30
     counter = 0
     try:
-        for page in Cursor(api2.search_30_day, label="dev",
-                           query="place_country:Au place:Melbourne (food OR restaurant)").pages(1):
+        for page in Cursor(api.search_30_day, label="dev",
+                           query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic)).pages(1):
             counter += 1
             lock.acquire()
             for tweet in page:
@@ -271,6 +276,7 @@ def check():
             a_file.close()
             tweets_list = []
             lock.release()
+            print("couchdb ready")
             CouchDB(SERVER_PATH, DB_NAME, process_tweet(process_tweet_list))
 
             print("end checking")
@@ -288,7 +294,7 @@ def search_full(bearerToken, label, fromDate, toDate):
 
     try:
         for page in Cursor(api.search_full_archive, label=label,
-                           query="place_country:Au place:Melbourne (food OR restaurant)", fromDate=fromDate,
+                           query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic), fromDate=fromDate,
                            toDate=toDate).pages(1):
             counter += 1
             lock.acquire()
@@ -306,29 +312,29 @@ def search_full(bearerToken, label, fromDate, toDate):
 # Create two threads as follows
 bearer_tokens = ["TWITTER_BEARER_TOKEN", "TWITTER_BEARER_TOKEN2", "TWITTER_BEARER_TOKEN3", "TWITTER_BEARER_TOKEN4",
                  "TWITTER_BEARER_TOKEN5"]
-labels = ["devfull", "devleo"]
-fromDates = ["202104080000", "202004080000", "201904080000", "201804080000", "201704080000"]
-toDates = ["202204080000", "202104070000", "202004070000""201904070000", "201804070000"]
+labels = ["devfull", "devleo", "JOE1", "JOE2", "dev"]
+fromDates = "201704080000"
+toDates = "202204080000"
 
 if __name__ == "__main__":
     try:
         print("start")
-        t0 = threading.Thread(target=search_recent)  # 7 days
+        #t0 = threading.Thread(target=search_recent)  # 7 days
         # t1 = threading.Thread(target=search_30)
-        # t2 = threading.Thread(target=stream)
+        t2 = threading.Thread(target=stream)
         t3 = threading.Thread(target=check)
-        threads.append(t0)
+        #threads.append(t0)
         # threads.append(t1)
-        # threads.append(t2)
+        threads.append(t2)
         threads.append(t3)
-        t0.start()
+        #t0.start()
         # t1.start()
-        # t2.start()
+        t2.start()
         t3.start()
-        # for i in range(5):
-        #      t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDates[i], toDates[i]])
-        #      threads.append(t)
-        #      t.start()
+
+        # t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDate, toDate])
+        # threads.append(t)
+        #  t.start()
         [thread.join() for thread in threads]
         # tweets_list = []
         # with open("food.js", "a+") as f:
