@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://127.0.0.1:5000",
   "dependencies": {
     "@react-google-maps/api": "^2.8.1",
     "@syncfusion/ej2-react-charts": "^20.1.52",

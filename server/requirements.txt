@@ -1,6 +1,8 @@
 couchdb
 textblob
 nltk
+flask
 pyshp
 pandas
 tweepy
+flask_cors

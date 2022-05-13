@@ -2,7 +2,10 @@ from flask import Flask, jsonify, abort, request, make_response, url_for, Respon
 import couchdb
 couch = couchdb.Server("http://admin:admin@172.26.130.202:5984")
 db = couch['twitter']
+from flask_cors import CORS
 app = Flask(__name__, static_url_path="")
+CORS(app)
+
 
 @app.errorhandler(400)
 def not_found(error):
@@ -12,6 +15,13 @@ def not_found(error):
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.route('/test')
+def test():
+        return jsonify({
+            "stuff": "Here be stuff"
+        })
 
 @app.route('/food', methods=['GET'])
 def get_food():
@@ -56,4 +66,4 @@ def get_food():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5001,debug=True)
+    app.run(debug=True, host='0.0.0.0')
