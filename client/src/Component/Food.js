@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import Map, { Source, Layer } from "react-map-gl";
-import { CartesianGrid,BarChart, Bar, XAxis, YAxis, Legend, Tooltip } from 'recharts';
+import { CartesianGrid,BarChart, Bar, XAxis, YAxis, Legend, Tooltip,LineChart,Line } from 'recharts';
 import ReactLoading from 'react-loading';
 import '../App.css';
 
@@ -16,19 +16,20 @@ function Food() {
 
   const [rawdata, setRawData] = useState()
   const [loading, setLoading] = useState(true)
-
+  
 
     useEffect( () => {
 
-       fetch('/food')
+       fetch('http://127.0.0.1:80/food')
        .then(response => response.json())
        .then(data => {
          setRawData(data.results)
          setLoading(false)   
        })
-      
     
     },[]);
+
+    
 
   
   const layerStyle = {
@@ -64,7 +65,7 @@ function Food() {
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.num_tweets}>
         <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
-          <XAxis dataKey="area" fontSize="14"/>
+          <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
           <YAxis dataKey="num_tweets" />
           <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={40} />
@@ -76,26 +77,20 @@ function Food() {
 
 
 
-
+      
       <div className="charts">
       <BarChart
           width={500}
           height={300}
           data={rawdata.sentiments}
-          margin={{
-            top: 5,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
         >
           <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
-          <XAxis dataKey="area" fontSize="14"/>
+          <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
           <YAxis />
           <Legend verticalAlign="top" height={40}/>
           <Tooltip cursor={false}/>
           <Bar dataKey="num_positive" fill="#2D6BCF" />
-          <Bar dataKey="num_neutral" fill="#03CB00" />
+          <Bar dataKey="num_neutral" fill="#068E04" />
           <Bar dataKey="num_negative" fill="#EC4817" />
         </BarChart>
       </div>
@@ -109,22 +104,30 @@ function Food() {
       </div>
       <div className="chart-container">
         <div className="charts">
-        <BarChart width={500} height={300} data={rawdata.income}>
-          <XAxis dataKey="area" />
+        <BarChart width={500} height={300} data={rawdata.incomes}>
+        <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
+          <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
           <YAxis dataKey="income" />
+          <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={36} />
           <Bar name="Median household income vs. SA4" dataKey="income" barSize={30} fill="#4D5B7F"
            />
         </BarChart>
       </div>
+
+
+
+
       <div className="charts">
-        <BarChart width={500} height={300} data={rawdata}>
-          <XAxis dataKey="name" />
-          <YAxis dataKey="poportion" />
+        <LineChart width={500} height={300} data={rawdata.relationships}>
+        <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
+          <XAxis dataKey= "income" fontSize="10"  interval={0} angle={-9} textAnchor="end"/>
+          <YAxis />
+          <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={36} />
-          <Bar name="Happiness vs. income" dataKey="poportion" barSize={30} fill="#616A6B"/>
-          <Bar name="tweet count" dataKey="tweetSize" barSize={30} fill="#4D5B7F"/>
-        </BarChart>
+          <Line type="monotone" dataKey="negativePercentage" stroke="#730202" />
+          <Line type="monotone" dataKey="positivePercentage" stroke="#00681B" />
+        </LineChart>
       </div>
       </div>
 

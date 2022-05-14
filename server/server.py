@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, abort, request, make_response, url_for, Response
 import couchdb
 import ast
-couch = couchdb.Server("http://admin:admin@172.26.135.34:5984/")
+couch = couchdb.Server("http://admin:admin@172.26.129.26:5984/")
 areas = ["Melbourne - Inner", "Melbourne - Inner East", "Melbourne - Inner South","Melbourne - North East","Melbourne - North West",
              "Melbourne - Outer East","Melbourne - South East","Melbourne - West","Mornington Peninsula"]
 areas2 = ["Inner", "Inner East", "Inner South","North East","North West",

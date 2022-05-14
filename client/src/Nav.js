@@ -15,7 +15,6 @@ function Nav() {
           <Link to="/"><Button variant="primary">Home</Button></Link>
           <Link to="/Food"><Button variant="primary">Food</Button></Link>
           <Link to="/Park"><Button variant="primary">Park</Button></Link>
-          <Link to="/Test"><Button variant="primary">Test</Button></Link>
       </div>
     </div>
   );
