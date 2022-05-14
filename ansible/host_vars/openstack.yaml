@@ -23,7 +23,6 @@ volumes:
   - vol_name: data-vol-3
     vol_size: 5
 
-
 # Instance
 instances:
   - name: i0

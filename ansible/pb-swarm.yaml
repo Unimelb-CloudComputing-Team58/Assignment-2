@@ -1,4 +1,5 @@
 ---
+# Initialise Docker Swarm
 - hosts: swarm_leader
   become: true
   vars_files:
@@ -13,7 +14,7 @@
         manager_token: "{{ swarm_info.swarm_facts.JoinTokens.Manager }}"
         worker_token: "{{ swarm_info.swarm_facts.JoinTokens.Worker }}"
 
-
+# Add managers to Docker Swarm
 - hosts: swarm_manager
   become: true
   vars_files:
@@ -22,11 +23,11 @@
     - name: add managers to swarm
       community.docker.docker_swarm:
         state: join
-        join_token: "{{ hostvars[ swarm_leader ]['manager_token'] }}"
-        remote_addrs: "{{ swarm_leader }}:2377"
-      # loop: "{{ groups['swarm_leader'] }}"
+        join_token: "{{ hostvars[ item ]['manager_token'] }}"
+        remote_addrs: "{{ item }}:2377"
+      loop: "{{ groups['swarm_leader'] }}"
 
-
+# Add workers to Docker Swarm
 - hosts: swarm_worker
   become: true
   vars_files:
@@ -35,5 +36,6 @@
     - name: add workers to swarm
       community.docker.docker_swarm:
         state: join
-        join_token: "{{ hostvars[ swarm_leader ]['worker_token'] }}"
-        remote_addrs: "{{ swarm_leader }}:2377"
+        join_token: "{{ hostvars[ item ]['worker_token'] }}"
+        remote_addrs: "{{ item }}:2377"
+      loop: "{{ groups['swarm_leader'] }}"

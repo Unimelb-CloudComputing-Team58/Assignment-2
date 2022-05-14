@@ -1,21 +1,15 @@
 ---
-- name: Create a security group
+- name: Create security groups
   openstack.cloud.security_group:
     name: '{{ item.name }}'
     description: '{{ item.description }}'
     state: present
   loop: '{{ security_groups }}'
 
-
 - name: Create a list of security group names
   set_fact:
     sg_names: '{{ sg_names|default([]) + [ item.name ] }}'
   loop: '{{ security_groups }}'
-
-# - name: "Display all security groups created"
-#   debug:
-#     msg: "Security group(s) {{ sg_names }} have been created."
-
 
 - name: Create security group rules for public
   os_security_group_rule:
@@ -27,8 +21,6 @@
     state: present
   loop: '{{ security_group_rules_public }}'
 
-
-# Create security group rules private 
 - name: Create security group rules for CouchDB
   os_security_group_rule:
     security_group: '{{ item.name }}'

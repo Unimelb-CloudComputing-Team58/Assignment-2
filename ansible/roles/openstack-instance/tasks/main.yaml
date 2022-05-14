@@ -1,6 +1,5 @@
 ---
-# Create an instance on NeCTAR
-- name: Create an instance
+- name: Create MRC instance
   openstack.cloud.server:
     name: '{{ item.name }}'
     image: '{{ instance_image }}'
@@ -25,54 +24,8 @@
   loop: '{{ os_instance.results }}'
   when: item.openstack is defined
 
-- name: Extract IPs
+- name: Extract Instance IPs
   set_fact:
     IPs: "{{ IPs|default([]) + [item.openstack.public_v4] }}"
   loop: "{{ os_instance.results }}"
   when: item.openstack is defined
-
-
-# Given the quota of 4 MRC instances, we create a 3-manager Docker Swarm.
-# - MRC instance 0 is the leader of the managers
-# - MRC instance 1 and 2 are also managers
-# - MRC instance 3 is a worker.
-# managers are also workers in this setup
-#
-# CouchDB will be set up on instances 1, 2 and 3
-# for convenience, instance 3 will be the coordinator for the setup
-
-- name: add instance 0 to hosts as the Swarm leader 
-  ansible.builtin.add_host:
-    name: "{{ IPs[0] }}"
-    group: swarm_leader
-
-- name: add instances 1, 2 to hosts as Swarm manager and CouchDB node
-  ansible.builtin.add_host:
-    name: "{{ item }}"
-    groups:
-      - swarm_manager
-      - couchdb_nodes
-  loop: "{{ [1,2] | map('extract', IPs) | list }}"
-
-- name: add instances 3 to hosts as Swarm worker and CouchDB coordinator
-  ansible.builtin.add_host:
-    name: "{{ IPs[3] }}"
-    groups:
-      - swarm_worker
-      - couchdb_coordinator
-
-
-# # Add master node to Ansible in-memory inventory
-# - name: Add master
-#   ansible.builtin.add_host:
-#     name: '{{ os_instance.results[0].openstack.public_v4 }}'
-#     groups: master
-#   when: os_instance.results[0].openstack is defined
-
-# # Add workder nodes to Ansible in-memory inventory
-# - name: Add workers
-#   ansible.builtin.add_host:
-#     name: '{{ item.openstack.public_v4 }}'
-#     groups: workers
-#   loop: "{{ [1] | map('extract', os_instance.results) | list }}"
-#   when: item.openstack is defined

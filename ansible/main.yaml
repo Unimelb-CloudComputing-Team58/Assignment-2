@@ -1,15 +1,18 @@
 ---
+# Configure local host and create instances on MRC
 - hosts: localhost
+  become: true
   vars_files:
     - host_vars/openstack.yaml
   roles:
-    # - role: localhost-common
-    # - role: openstack-volume
+    - role: localhost-common
+    - role: openstack-volume
     - role: openstack-security-group
     - role: openstack-instance
+    - role: openstack-host-group
 
-
-- hosts: leader, manager, worker
+# Configure MRC instances
+- hosts: all
   vars_files:
     - host_vars/mrc.yaml
   roles:
@@ -17,20 +20,22 @@
     - role: mrc-volumes
     - role: mrc-docker
 
+# Create CouchDB container and set up CouchDB cluster
+- name: Create CouchDB container and set up CouchDB cluster
+  import_playbook: pb-couchdb.yaml
 
-- name: set up swarm
+# Set up Docker Swarm
+- name: Set up Docker Swarm
   import_playbook: pb-swarm.yaml
 
-
-- hosts: couchdb_coordinator, couchdb_nodes
+# Deploy back & front end and Twitter harvester as Docker Swarm Service
+- name: swarm_leader
+  become: true
   vars_files:
     - host_vars/mrc.yaml
   roles:
-    - role: couchdb-setup
+    - role: service-back-end
+    - role: service-front-end
+    - role: service-harvester
 
 
-- hosts: couchdb_nodes
-  vars_files:
-    - host_vars/mrc.yaml
-  roles:
-    - role: couchdb-cluster

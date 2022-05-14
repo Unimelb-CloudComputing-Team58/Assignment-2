@@ -1,0 +1,16 @@
+---
+# Create CouchDB containers
+- hosts: couchdb_coordinator, couchdb_nodes
+  become: true
+  vars_files:
+    - host_vars/mrc.yaml
+  roles:
+    - role: couchdb-setup
+
+# Set up CouchDB cluster
+- hosts: couchdb_nodes
+  become: true
+  vars_files:
+    - host_vars/mrc.yaml
+  roles:
+    - role: couchdb-cluster

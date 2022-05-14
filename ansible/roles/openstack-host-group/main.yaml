@@ -1,0 +1,29 @@
+---
+# Given the quota of 4 MRC instances, we create a 3-manager Docker Swarm.
+# - MRC instance 0 is the leader of the managers
+# - MRC instance 1 and 2 are also managers
+# - MRC instance 3 is a worker.
+# managers are also workers in this setup
+
+# CouchDB will be set up on instances 1, 2 and 3
+# for convenience, instance 3 will be the coordinator for the setup
+
+- name: add instance 0 to hosts as the Swarm leader 
+  ansible.builtin.add_host:
+    name: "{{ IPs[0] }}"
+    group: swarm_leader
+
+- name: add instances 1, 2 to hosts as Swarm manager and CouchDB node
+  ansible.builtin.add_host:
+    name: "{{ item }}"
+    groups:
+      - swarm_manager
+      - couchdb_nodes
+  loop: "{{ [1,2] | map('extract', IPs) | list }}"
+
+- name: add instance 3 to hosts as Swarm worker and CouchDB coordinator
+  ansible.builtin.add_host:
+    name: "{{ IPs[3] }}"
+    groups:
+      - swarm_worker
+      - couchdb_coordinator
