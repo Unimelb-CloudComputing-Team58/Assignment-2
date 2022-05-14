@@ -59,9 +59,18 @@ def get_food():
         x = r.key[2][1:-1].split(',')
         y = [float(x[0]), float(x[1])]
         coordinates.append(y)
+    db_arin = couch['aurin']
+    results = db_arin.view('area_income/get_area_income')
+    incomes = []
+    for r in results:
+        dic = {}
+        dic["area"] = r.key[0]
+        dic["income"] = r.key[1]
+        incomes.append(dic)
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
+    result['incomes'] = incomes
     return jsonify({'results': result})
 
 @app.route('/park', methods=['GET'])
@@ -105,23 +114,21 @@ def get_park():
         x = r.key[2][1:-1].split(',')
         y = [float(x[0]), float(x[1])]
         coordinates.append(y)
-    result['num_tweets'] = tweets_results
-    result['sentiments'] = sentiments
-    result['coordinates'] = coordinates
-    return jsonify({'results': result})
-
-
-@app.route('/aurin', methods=['GET'])
-def get_aurin():
-    db = couch['aurin']
-    results = db.view('area_income/get_area_income')
+    db_arin = couch['aurin']
+    results = db_arin.view('area_income/get_area_income')
     incomes = []
     for r in results:
         dic = {}
         dic["area"] = r.key[0]
         dic["income"] = r.key[1]
         incomes.append(dic)
-    return jsonify({'results': incomes})
+    result['num_tweets'] = tweets_results
+    result['sentiments'] = sentiments
+    result['coordinates'] = coordinates
+    result['incomes'] = incomes
+    return jsonify({'results': result})
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
