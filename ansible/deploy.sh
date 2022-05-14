@@ -1,3 +1,3 @@
 #!/bin/bash
 
-. ./openrc.sh; ansible-playbook main.yaml
+. ./openrc.sh; ansible-playbook --ask-become-pass pb-main.yaml
