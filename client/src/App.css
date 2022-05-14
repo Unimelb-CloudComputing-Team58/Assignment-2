@@ -44,9 +44,15 @@ body {
   height: 100px;
 }
 
+.homecomponent h1 {
+  text-align: center;
+  margin-left: 80px;
+}
+
 .homecomponent img {
   height: 700px;
-  width: 700px;
+  width: 600px;
+  margin-left: 50px;
 }
 
 .homecomponent h1 {
