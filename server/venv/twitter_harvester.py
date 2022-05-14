@@ -29,10 +29,27 @@ else:
     query_topic = args[2]
     area = args[1]
 print(args)
-print(query_topic,area)
+print(query_topic, area)
 
-#importing the module
-import logging
+dic_file = "area_coordinate.pkl"
+a_file = open(dic_file, "rb")
+area_coordinate_dic = pickle.load(a_file)
+a_file.close()
+
+serach_coordinate = []
+if area == 'Melbourne' or area == 'MEL':
+    for key,coordinate_list in area_coordinate_dic.items():
+        for coordinate in coordinate_list:
+            serach_coordinate.append(coordinate)
+else:
+    if area in area_coordinate_dic:
+        for coordinate in area_coordinate_dic[area]:
+            serach_coordinate.append(coordinate)
+    else:
+        print("Area is illegal, using melbourne as default")
+        for key, coordinate_list in area_coordinate_dic.items():
+            for coordinate in coordinate_list:
+                serach_coordinate.append(coordinate)
 
 # #now we will Create and configure logger
 # logging.basicConfig(filename="std.log",
@@ -64,7 +81,6 @@ api = API(auth)
 lock = threading.Lock()
 threads = []
 
-
 query_string = "food OR restaurant OR breakfast OR lunch OR dinner OR cook OR cafe"
 # query_string = "covid-19 OR coronavirus OR #covid-19 OR #coronavirus"
 # query_string = "market OR supermarket"
@@ -72,6 +88,7 @@ query_string = "food OR restaurant OR breakfast OR lunch OR dinner OR cook OR ca
 # query_string = "melbournemoney OR #melbournemoney"
 query_string = "*"
 max_id = None
+
 
 def CouchDB(SERVER_PATH, DB_NAME, data_list):
     couch = couchdb.Server(SERVER_PATH)
@@ -156,38 +173,41 @@ def search_recent():
     # for i in range(2):
     print("get in search_recent")
     i = 1
-    while(i):
+    while (i):
         print("i th search", i)
         i += 1
-        resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km")
-        lock.acquire()
-        with open("test.json", 'w') as f:
-            for i, tweet in enumerate(resp):
-                if tweet.coordinates is not None:
-                    # resps.append(processTweet(tweet))
-                    num_geo_tweets += 1
-                    tweets_list.append(json.dumps(tweet._json))
-            lock.release()
-            while (len(resp) > 0):
-                print("count", counter)
-                print(len(resp))
-                max_id = resp[-1].id - 1
-                resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
-                                         max_id=max_id)
-                lock.acquire()
-                counter += 1
-                for tweet in resp:
+        for coordinate in serach_coordinate:
+            geocode = str(coordinate[0]) + ',' + str(coordinate[1]) + ',' + '15km'
+            print("Start:",geocode)
+            resp = api.search_tweets(q=query_topic, count=max_results, geocode=geocode)
+            lock.acquire()
+            with open("test.json", 'w') as f:
+                for i, tweet in enumerate(resp):
                     if tweet.coordinates is not None:
-                        tweets_list.append(json.dumps(tweet._json))
+                        # resps.append(processTweet(tweet))
                         num_geo_tweets += 1
-                    # json.dumps(tweet._json, f, indent=2)
+                        tweets_list.append(json.dumps(tweet._json))
                 lock.release()
-                if (counter == limit):
-                    print("sleep")
-                    print(num_geo_tweets)
-                    print(len(resps))
-                    print(len(set(resps)))
-                    time.sleep(15 * 60)
+                while (len(resp) > 0):
+                    print("count", counter)
+                    print(len(resp))
+                    max_id = resp[-1].id - 1
+                    resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
+                                             max_id=max_id)
+                    lock.acquire()
+                    counter += 1
+                    for tweet in resp:
+                        if tweet.coordinates is not None:
+                            tweets_list.append(json.dumps(tweet._json))
+                            num_geo_tweets += 1
+                        # json.dumps(tweet._json, f, indent=2)
+                    lock.release()
+                    if (counter == limit):
+                        print("sleep")
+                        print(num_geo_tweets)
+                        print(len(resps))
+                        print(len(set(resps)))
+                        time.sleep(15 * 60)
 
     print(resps)
     print(num_geo_tweets)
@@ -219,7 +239,8 @@ tweetListener = TweetListener(
 
 
 def stream():
-    tweetListener.filter(track=["{topic}".format(topic=query_topic)], locations=[144.3336, -38.5030, 145.8784, -37.1751])
+    tweetListener.filter(track=["{topic}".format(topic=query_topic)],
+                         locations=[144.3336, -38.5030, 145.8784, -37.1751])
 
 
 def search_30():
@@ -294,7 +315,8 @@ def search_full(bearerToken, label, fromDate, toDate):
 
     try:
         for page in Cursor(api.search_full_archive, label=label,
-                           query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic), fromDate=fromDate,
+                           query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic),
+                           fromDate=fromDate,
                            toDate=toDate).pages(1):
             counter += 1
             lock.acquire()
@@ -319,17 +341,17 @@ toDates = "202204080000"
 if __name__ == "__main__":
     try:
         print("start")
-        #t0 = threading.Thread(target=search_recent)  # 7 days
+        t0 = threading.Thread(target=search_recent)  # 7 days
         # t1 = threading.Thread(target=search_30)
-        t2 = threading.Thread(target=stream)
+        # t2 = threading.Thread(target=stream)
         t3 = threading.Thread(target=check)
-        #threads.append(t0)
+        # threads.append(t0)
         # threads.append(t1)
-        threads.append(t2)
+        # threads.append(t2)
         threads.append(t3)
-        #t0.start()
+        t0.start()
         # t1.start()
-        t2.start()
+        # t2.start()
         t3.start()
 
         # t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDate, toDate])
