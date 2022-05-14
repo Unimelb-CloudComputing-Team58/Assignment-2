@@ -75,29 +75,22 @@ def get_food():
         sentiments[i]["area"]= areas2[i]
         incomes[i]["area"]= areas2[i]
 
-    relationships_po = []
+    relationships = []
     for i in range(len(areas2)):
         dic = {}
         dic["income"] = incomes[i]["income"]
-        dic["positivePercentage"] = sentiments[i]["num_positive"] / (sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
-        relationships_po.append(dic)
-    relationships_po = sorted(relationships_po, key=lambda x: x["income"])
-
-    relationships_neg = []
-    for i in range(len(areas2)):
-        dic = {}
-        dic["income"] = incomes[i]["income"]
-        dic["negativePercentage"] = sentiments[i]["num_negative"] / (sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
-        relationships_neg.append(dic)
-
-    relationships_neg = sorted(relationships_neg, key=lambda x: x["income"])
+        dic["positivePercentage"] = sentiments[i]["num_positive"] / (
+                sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
+        dic["negativePercentage"] = sentiments[i]["num_negative"] / (
+                sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
+        relationships.append(dic)
+    relationships = sorted(relationships, key=lambda x: x["income"])
 
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
     result['incomes'] = incomes
-    result['relationships_po'] = relationships_po
-    result['relationships_neg'] = relationships_neg
+    result['relationships'] = relationships
 
 
     return jsonify({'results': result})
@@ -157,31 +150,26 @@ def get_park():
         sentiments[i]["area"]= areas2[i]
         incomes[i]["area"]= areas2[i]
 
-    relationships_po = []
+    relationships = []
     for i in range(len(areas2)):
         dic = {}
         dic["income"] = incomes[i]["income"]
         dic["positivePercentage"] = sentiments[i]["num_positive"] / (
                     sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
-        relationships_po.append(dic)
-    relationships_po = sorted(relationships_po, key=lambda x: x["income"])
-
-    relationships_neg = []
-    for i in range(len(areas2)):
-        dic = {}
-        dic["income"] = incomes[i]["income"]
         dic["negativePercentage"] = sentiments[i]["num_negative"] / (
-                    sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
-        relationships_neg.append(dic)
+                sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
+        relationships.append(dic)
+    relationships = sorted(relationships, key=lambda x: x["income"])
 
-    relationships_neg = sorted(relationships_neg, key=lambda x: x["income"])
+
+
 
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
     result['incomes'] = incomes
-    result['relationships_po'] = relationships_po
-    result['relationships_neg'] = relationships_neg
+    result['relationships'] = relationships
+
     return jsonify({'results': result})
 
 
