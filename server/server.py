@@ -5,7 +5,7 @@ couch = couchdb.Server("http://admin:admin@172.26.135.34:5984/")
 areas = ["Melbourne - Inner", "Melbourne - Inner East", "Melbourne - Inner South","Melbourne - North East","Melbourne - North West",
              "Melbourne - Outer East","Melbourne - South East","Melbourne - West","Mornington Peninsula"]
 areas2 = ["Inner", "Inner East", "Inner South","North East","North West",
-             "Outer East","South East","West","Mornington Peninsula"]
+             "Outer East","South East","West","Mornington"]
 from flask_cors import CORS
 app = Flask(__name__, static_url_path="")
 CORS(app)
@@ -75,10 +75,18 @@ def get_food():
         sentiments[i]["area"]= areas2[i]
         incomes[i]["area"]= areas2[i]
 
+    relationships = []
+    for i in range(len(areas2)):
+        dic = {}
+        dic["income"] = incomes[i]["income"]
+        dic["positivePercentage"] = sentiments[i]["num_positive"] / (sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
+        relationships.append(dic)
+
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
     result['incomes'] = incomes
+    result['relationships'] = relationships
 
 
     return jsonify({'results': result})
@@ -131,17 +139,26 @@ def get_park():
         dic["area"] = r.key[0]
         dic["income"] = r.key[1]
         incomes.append(dic)
-        
+
     # shorten area name by removing Melbourne
     for i in range(len(areas2)):
         tweets_results[i]["area"] = areas2[i]
         sentiments[i]["area"]= areas2[i]
         incomes[i]["area"]= areas2[i]
 
+    relationships = []
+    for i in range(len(areas2)):
+        dic = {}
+        dic["income"] = incomes[i]["income"]
+        dic["positivePercentage"] = sentiments[i]["num_positive"] / (
+                    sentiments[i]["num_positive"] + sentiments[i]["num_negative"] + sentiments[i]["num_neutral"])
+        relationships.append(dic)
+
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
     result['incomes'] = incomes
+    result['relationships'] = relationships
     return jsonify({'results': result})
 
 
