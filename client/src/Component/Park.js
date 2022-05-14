@@ -20,7 +20,7 @@ function Park() {
   const [loading, setLoading] = useState(true)
 
     useEffect( () => {
-      fetch('http://0.0.0.0:5000/park')
+      fetch('http://172.26.135.30:5000/food')
       .then(response => response.json())
       .then(data => {
         setRawData(data.results)
@@ -122,7 +122,7 @@ function Park() {
           {...viewport}
           style={{width: '1100px', height: '500px'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
-          mapboxAccessToken={process.env.REACT_APP_MAPBOX_TOKEN}
+          mapboxAccessToken="pk.eyJ1IjoiZnJvZ3R1bmEiLCJhIjoiY2wyOTlsdjhrMGhhaDNrbnpqNnp1eWZleSJ9.3gYSSvMmoQK0iv85aSWjEQ"
         >
       <Source id="my-data" type="geojson" data={geojson}>
         <Layer {...layerStyle} />
