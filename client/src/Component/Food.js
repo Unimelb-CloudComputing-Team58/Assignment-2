@@ -20,7 +20,7 @@ function Food() {
 
     useEffect( () => {
 
-       fetch('http://127.0.0.1:80/food')
+       fetch('http://0.0.0.0:5000/food')
        .then(response => response.json())
        .then(data => {
          setRawData(data.results)

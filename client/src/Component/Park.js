@@ -20,7 +20,7 @@ function Park() {
   const [loading, setLoading] = useState(true)
 
     useEffect( () => {
-      fetch('http://127.0.0.1:80/park')
+      fetch('http://0.0.0.0:5000/park')
       .then(response => response.json())
       .then(data => {
         setRawData(data.results)
