@@ -35,7 +35,7 @@ function Food() {
     id:   'Point',
     type: 'circle',
     paint: {
-      'circle-radius': 1,
+      'circle-radius': 2,
       'circle-color': '#00BFFF'
     }
   };
@@ -72,11 +72,16 @@ function Food() {
 
         </BarChart>
       </div>
+
+
+
+
+
       <div className="charts">
       <BarChart
           width={500}
           height={300}
-          data={rawdata.sentiements}
+          data={rawdata.sentiments}
           margin={{
             top: 5,
             right: 30,
@@ -90,6 +95,7 @@ function Food() {
           <Legend verticalAlign="top" height={40}/>
           <Tooltip cursor={false}/>
           <Bar dataKey="num_positive" fill="#2D6BCF" />
+          <Bar dataKey="num_neutral" fill="#03CB00" />
           <Bar dataKey="num_negative" fill="#EC4817" />
         </BarChart>
       </div>
@@ -103,11 +109,11 @@ function Food() {
       </div>
       <div className="chart-container">
         <div className="charts">
-        <BarChart width={500} height={300} data={rawdata}>
-          <XAxis dataKey="name" />
-          <YAxis dataKey="tweetSize" />
+        <BarChart width={500} height={300} data={rawdata.income}>
+          <XAxis dataKey="area" />
+          <YAxis dataKey="income" />
           <Legend verticalAlign="top" height={36} />
-          <Bar name="Median household income vs. SA4" dataKey="tweetSize" barSize={30} fill="#4D5B7F"
+          <Bar name="Median household income vs. SA4" dataKey="income" barSize={30} fill="#4D5B7F"
            />
         </BarChart>
       </div>

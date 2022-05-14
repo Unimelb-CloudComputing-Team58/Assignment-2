@@ -9,7 +9,8 @@ function Home() {
 
   return (
     <div className="homecomponent">
-      <h1>welcome</h1>
+      <img src="/food.png" ></img>
+      <img src="/food.png" ></img>
     </div>
 
   );

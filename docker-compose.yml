@@ -8,7 +8,6 @@ services:
         volumes:
           - "./server:/app"
 
-
       client:
         build: "./client"
         image: "leo727268082/meltest-client"

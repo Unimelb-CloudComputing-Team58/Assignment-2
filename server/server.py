@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, abort, request, make_response, url_for, Response
 import couchdb
+import ast
 couch = couchdb.Server("http://admin:admin@172.26.135.34:5984/")
 
 from flask_cors import CORS
@@ -39,7 +40,7 @@ def get_food():
         dic = {}
         dic["area"] = area
         dic["num_positive"] = 0
-        dic["num_natural"] = 0
+        dic["num_neutral"] = 0
         dic["num_negative"] = 0
         sentiments.append(dic)
     for r in results2:
@@ -49,13 +50,15 @@ def get_food():
                 if r.key[1] == "POSITIVE":
                     s["num_positive"] = r.value
                 elif r.key[1] == "NEUTRAL":
-                    s["num_natural"] = r.value
+                    s["num_neutral"] = r.value
                 else:
                     s["num_negative"] = r.value
 
     coordinates = []
     for r in results3:
-        coordinates.append(r.key[2])
+        x = r.key[2][1:-1].split(',')
+        y = [float(x[0]), float(x[1])]
+        coordinates.append(y)
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
@@ -83,7 +86,7 @@ def get_park():
         dic = {}
         dic["area"] = area
         dic["num_positive"] = 0
-        dic["num_natural"] = 0
+        dic["num_neutral"] = 0
         dic["num_negative"] = 0
         sentiments.append(dic)
     for r in results2:
@@ -93,13 +96,15 @@ def get_park():
                 if r.key[1] == "POSITIVE":
                     s["num_positive"] = r.value
                 elif r.key[1] == "NEUTRAL":
-                    s["num_natural"] = r.value
+                    s["num_neutral"] = r.value
                 else:
                     s["num_negative"] = r.value
 
     coordinates = []
     for r in results3:
-        coordinates.append(r.key[2])
+        x = r.key[2][1:-1].split(',')
+        y = [float(x[0]), float(x[1])]
+        coordinates.append(y)
     result['num_tweets'] = tweets_results
     result['sentiments'] = sentiments
     result['coordinates'] = coordinates
@@ -119,4 +124,4 @@ def get_aurin():
     return jsonify({'results': incomes})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)

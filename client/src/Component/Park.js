@@ -17,19 +17,20 @@ function Park() {
 
   const [rawdata, setRawData] = useState()
   const [loading, setLoading] = useState(true)
+  const [aurin, setAurin] = useState()
 
 
-    useEffect( () => {
+    useEffect(() => {
 
        fetch('/park')
        .then(response => response.json())
        .then(data => {
          setRawData(data.results)
          setLoading(false)   
-       })
-      
+       })   
     
     },[]);
+
 
   
   const layerStyle = {
@@ -74,11 +75,14 @@ function Park() {
 
         </BarChart>
       </div>
+
+
+
       <div className="charts">
       <BarChart
           width={500}
           height={300}
-          data={rawdata.sentiements}
+          data={rawdata.sentiments}
           margin={{
             top: 5,
             right: 30,
@@ -92,6 +96,7 @@ function Park() {
           <Legend verticalAlign="top" height={40}/>
           <Tooltip cursor={false}/>
           <Bar dataKey="num_positive" fill="#2D6BCF" />
+          <Bar dataKey="num_neutral" fill="#03CB00" />
           <Bar dataKey="num_negative" fill="#EC4817" />
         </BarChart>
       </div>
