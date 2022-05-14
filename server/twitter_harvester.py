@@ -77,7 +77,7 @@ if not bearer_token:
     raise RuntimeError("Not found bearer token")
 
 auth = OAuth2BearerHandler(bearer_token)
-api = API(auth)
+api = API(auth, wait_on_rate_limit=True)
 lock = threading.Lock()
 threads = []
 
@@ -166,7 +166,6 @@ search recent 7 days tweets api v1.1
 def search_recent():
     num_geo_tweets = 0
     max_results = 100
-    limit = 450
     counter = 0
     resps = []
     # https://developer.twitter.com/en/docs/twitter-api/v1/tweets/search/overview
@@ -190,7 +189,7 @@ def search_recent():
                 lock.release()
                 while (len(resp) > 0):
                     print("count", counter)
-                    print(len(resp))
+                    #print(len(resp))
                     max_id = resp[-1].id - 1
                     resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
                                              max_id=max_id)
@@ -202,12 +201,8 @@ def search_recent():
                             num_geo_tweets += 1
                         # json.dumps(tweet._json, f, indent=2)
                     lock.release()
-                    if (counter == limit):
-                        print("sleep")
-                        print(num_geo_tweets)
-                        print(len(resps))
-                        print(len(set(resps)))
-                        time.sleep(15 * 60)
+                    print(counter)
+
 
     print(resps)
     print(num_geo_tweets)
@@ -244,7 +239,6 @@ def stream():
 
 
 def search_30():
-    limit = 30
     counter = 0
     try:
         for page in Cursor(api.search_30_day, label="dev",
@@ -256,9 +250,7 @@ def search_30():
                     tweets_list.append(tweet)
                     # print(tweet.created_at, tweet.text, tweet.coordinates)
             lock.release()
-            if counter == limit:
-                print("requests exceed minute limit")
-                time.sleep(60)
+
     except:
         print("requests exceed monthly maximum limit")
 
@@ -304,14 +296,13 @@ def check():
 
 
 def search_full(bearerToken, label, fromDate, toDate):
-    limit = 30
     counter = 0
     bearer_token = os.getenv(bearerToken)
     if not bearer_token:
         raise RuntimeError("Not found bearer token")
 
     auth = OAuth2BearerHandler(bearer_token)
-    api = API(auth)
+    api = API(auth, wait_on_rate_limit=True)
 
     try:
         for page in Cursor(api.search_full_archive, label=label,
@@ -324,9 +315,7 @@ def search_full(bearerToken, label, fromDate, toDate):
                 if tweet.coordinates is not None:
                     tweets_list.append(tweet)
             lock.release()
-            if counter == limit:
-                print("requests exceed minute limit")
-                time.sleep(60)
+
     except:
         print("requests exceed maximum limit")
 
@@ -344,15 +333,15 @@ if __name__ == "__main__":
         t0 = threading.Thread(target=search_recent)  # 7 days
         # t1 = threading.Thread(target=search_30)
         # t2 = threading.Thread(target=stream)
-        t3 = threading.Thread(target=check)
+        # t3 = threading.Thread(target=check)
         # threads.append(t0)
         # threads.append(t1)
         # threads.append(t2)
-        threads.append(t3)
+        # threads.append(t3)
         t0.start()
         # t1.start()
         # t2.start()
-        t3.start()
+        # t3.start()
 
         # t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDate, toDate])
         # threads.append(t)
