@@ -102,3 +102,13 @@ if __name__ == "__main__":
     area_coordinate_dic = pickle.load(a_file)
     print(area_coordinate_dic)
     a_file.close()
+
+    def bounding_box(long_center,lat_center,dist = 5000):
+        east_lon = get_new_lng(long_center, lat_center, dist)
+        west_lon = get_new_lng(long_center, lat_center, -dist)
+        north_lat = get_new_lat(long_center, lat_center, dist)
+        south_lat = get_new_lat(long_center, lat_center, -dist)
+        print(west_lon, south_lat, east_lon, north_lat)
+        bounding_box_string = "bounding_box:[" + str(west_lon) + ' ' + str(south_lat) + ' ' + str(east_lon) + ' ' + str(
+            north_lat) + "]"
+        return bounding_box_string
