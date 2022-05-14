@@ -22,15 +22,19 @@ args = sys.argv
 query_topic = None
 area = None
 
-if len(args) < 3:
-    print("Usage: python ./twitter_harvester <Area> <Topic>")
+if len(args) < 5:
+    print("Usage: python ./twitter_harvester <Area> <Topic> <Ip> <DB_name>")
     exit()
 else:
     query_topic = args[2]
     area = args[1]
+    SERVER_PATH = 'http://admin:admin@' + args[3] + ':5984'
+    DB_NAME = args[4]
+
 print(args)
 print(query_topic, area)
-
+print('SERVER_PATH: ', SERVER_PATH)
+print('DB_name: ',DB_NAME)
 dic_file = "area_coordinate.pkl"
 a_file = open(dic_file, "rb")
 area_coordinate_dic = pickle.load(a_file)
@@ -66,8 +70,8 @@ else:
 nltk.download('vader_lexicon')
 SHAPE_FILE_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\Assignment-2\aurin_data\shp_files\spatialise-median-house-price\shp\apm_sa4_2016_timeseries-.shp'
 TWEET_DATA_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\full_data\food.json'
-SERVER_PATH = 'http://admin:admin@127.0.0.1:5984'
-DB_NAME = 'catch'
+
+
 tweets_list = []
 threads = []
 
@@ -189,7 +193,7 @@ def search_recent():
                 lock.release()
                 while (len(resp) > 0):
                     print("count", counter)
-                    #print(len(resp))
+                    print(len(resp))
                     max_id = resp[-1].id - 1
                     resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
                                              max_id=max_id)
@@ -201,7 +205,6 @@ def search_recent():
                             num_geo_tweets += 1
                         # json.dumps(tweet._json, f, indent=2)
                     lock.release()
-                    print(counter)
 
 
     print(resps)
@@ -265,7 +268,7 @@ def check():
         if len(tweets_list) == 0:
             print("sleep")
             lock.release()
-            time.sleep(30)
+            time.sleep(3)
         else:
             print("start check", check_num)
             if os.path.exists(dic_file):
@@ -333,7 +336,7 @@ if __name__ == "__main__":
         t0 = threading.Thread(target=search_recent)  # 7 days
         # t1 = threading.Thread(target=search_30)
         # t2 = threading.Thread(target=stream)
-        # t3 = threading.Thread(target=check)
+        t3 = threading.Thread(target=check)
         # threads.append(t0)
         # threads.append(t1)
         # threads.append(t2)
@@ -341,7 +344,7 @@ if __name__ == "__main__":
         t0.start()
         # t1.start()
         # t2.start()
-        # t3.start()
+        t3.start()
 
         # t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDate, toDate])
         # threads.append(t)
