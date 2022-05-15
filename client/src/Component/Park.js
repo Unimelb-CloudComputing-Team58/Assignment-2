@@ -102,6 +102,7 @@ function Park() {
       <div className="chart-container">
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.incomes}>
+        <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
           <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
           <YAxis dataKey="income" />
           <Tooltip cursor={false}/>

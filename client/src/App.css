@@ -14,8 +14,8 @@ body {
 .loading {
   height: 600px;
   text-align: center;
-  margin-top: 100px;
-  margin-left: 550px;
+  margin-left: 40vw;
+  margin-top: 80px;
 }
 
 .Heading h1 {

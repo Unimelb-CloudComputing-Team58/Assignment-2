@@ -17,7 +17,9 @@ function Food() {
   const [rawdata, setRawData] = useState()
   const [loading, setLoading] = useState(true)
 
-  
+    console.log(process.env.REACT_APP_URL)
+
+
     useEffect( () => {
 
        fetch(process.env.REACT_APP_URL + "/food")
