@@ -61,6 +61,11 @@ function Food() {
   return (
 
     <div className="component">
+      <div className="link">
+      <a href="/htmls/median_house_price.html" target="_blank">housePrice</a>
+      <a href="/htmls/median_household_income.html" target="_blank">househod Income</a>
+      <a href="/htmls/sa3_venues.html" target="_blank">number of food/venues by sa3</a>
+      </div>
       <div className="chart-container">
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.num_tweets}>

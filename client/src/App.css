@@ -36,23 +36,25 @@ body {
 
 .homecomponent {
   margin-top: 30px;
-  height: 800px;
+  height: 650px;
+}
+
+.imagecontainer {
   display: inline-block;
+  text-align: center;
 }
 
 .test {
-  height: 100px;
-}
-
-.homecomponent h1 {
+  width: 50%;
+  float: left;
   text-align: center;
-  margin-left: 80px;
 }
 
-.homecomponent img {
-  height: 700px;
-  width: 600px;
-  margin-left: 50px;
+.imagecontainer img {
+  height: 100%;
+  width: 45.7vw;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .homecomponent h1 {
@@ -63,6 +65,16 @@ body {
 
 .component {
   height: 1400px;
+}
+
+.component .link {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.component .link a {
+  margin-left: 40px;
+  color: aliceblue;
 }
 
 .chart-container {

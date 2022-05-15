@@ -11,8 +11,8 @@ function Home() {
 
     <div className="homecomponent">
       <h1>welcome</h1>
-      <img src="/images/Food_v1.png" alt="food"></img>
-      <img src="/images/Park_v1.png" alt="park"></img>
+      <div className="test"><img src="/images/Food_v1.png" alt="food"></img></div>
+      <div className="test"><img src="/images/Park_v1.png" alt="park"></img></div>
     </div>
 
   );
