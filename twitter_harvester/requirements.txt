@@ -1,0 +1,9 @@
+couchdb
+textblob
+nltk
+python-dotenv
+pyshp
+pandas
+tweepy
+flask_cors
+Shapely
