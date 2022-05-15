@@ -20,7 +20,7 @@ function Park() {
   const [loading, setLoading] = useState(true)
 
     useEffect( () => {
-      fetch('http://172.26.135.30:5000/park')
+      fetch(process.env.REACT_APP_URL + "/park")
       .then(response => response.json())
       .then(data => {
         setRawData(data.results)

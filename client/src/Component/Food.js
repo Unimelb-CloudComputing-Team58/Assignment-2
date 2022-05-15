@@ -16,11 +16,11 @@ function Food() {
 
   const [rawdata, setRawData] = useState()
   const [loading, setLoading] = useState(true)
-  
 
+  
     useEffect( () => {
 
-       fetch('http://172.26.135.30:5000/food')
+       fetch(process.env.REACT_APP_URL + "/food")
        .then(response => response.json())
        .then(data => {
          setRawData(data.results)
