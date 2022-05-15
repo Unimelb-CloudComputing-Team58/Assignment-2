@@ -4,13 +4,11 @@ from dotenv import load_dotenv
 from tweepy import API, OAuth2BearerHandler
 from tweepy import Stream, Cursor
 import pickle
-import json
 import threading
 from textblob import TextBlob
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import json
-import pandas as pd
 import shapefile
 from shapely.geometry import Point  # Point class
 from shapely.geometry import shape  # shape() is a function to convert geo objects through the interface
@@ -18,20 +16,25 @@ import couchdb
 import numpy as np
 import sys
 
-args = sys.argv
-query_topic = None
-area = None
+area = os.environ['AREA']
+query_topic = os.environ['TOPIC']
+SERVER_PATH = os.environ["DB_SERVER"]
+DB_NAME = os.environ["DB_NAME"]
 
-if len(args) < 5:
-    print("Usage: python ./twitter_harvester <Area> <Topic> <Ip> <DB_name>")
-    exit()
-else:
-    query_topic = args[2]
-    area = args[1]
-    SERVER_PATH = 'http://admin:admin@' + args[3] + ':5984'
-    DB_NAME = args[4]
+# args = sys.argv
+# query_topic = None
+# area = None
 
-print(args)
+# if len(args) < 5:
+#     print("Usage: python ./twitter_harvester <Area> <Topic> <Ip> <DB_name>")
+#     exit()
+# else:
+#     query_topic = args[2]
+#     area = args[1]
+#     SERVER_PATH = 'http://admin:admin@' + args[3] + ':5984'
+#     DB_NAME = args[4]
+
+#print(args)
 print(query_topic, area)
 print('SERVER_PATH: ', SERVER_PATH)
 print('DB_name: ',DB_NAME)
@@ -68,8 +71,8 @@ else:
 
 
 nltk.download('vader_lexicon')
-SHAPE_FILE_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\Assignment-2\aurin_data\shp_files\spatialise-median-house-price\shp\apm_sa4_2016_timeseries-.shp'
-TWEET_DATA_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\full_data\food.json'
+SHAPE_FILE_PATH = './aurin_data/shp_files/spatialise-SA4/shp/apm_sa4_2016_timeseries-.shp'
+#TWEET_DATA_PATH = r'C:\Users\thoma\Desktop\IT\CCC\A2\full_data\food.json'
 
 
 tweets_list = []
@@ -85,12 +88,12 @@ api = API(auth, wait_on_rate_limit=True)
 lock = threading.Lock()
 threads = []
 
-query_string = "food OR restaurant OR breakfast OR lunch OR dinner OR cook OR cafe"
+#query_string = "food OR restaurant OR breakfast OR lunch OR dinner OR cook OR cafe"
 # query_string = "covid-19 OR coronavirus OR #covid-19 OR #coronavirus"
 # query_string = "market OR supermarket"
 # query_string = "park"
 # query_string = "melbournemoney OR #melbournemoney"
-query_string = "*"
+#query_string = "*"
 max_id = None
 
 
@@ -184,27 +187,27 @@ def search_recent():
             print("Start:",geocode)
             resp = api.search_tweets(q=query_topic, count=max_results, geocode=geocode)
             lock.acquire()
-            with open("test.json", 'w') as f:
-                for i, tweet in enumerate(resp):
+
+            for i, tweet in enumerate(resp):
+                if tweet.coordinates is not None:
+                    # resps.append(processTweet(tweet))
+                    num_geo_tweets += 1
+                    tweets_list.append(json.dumps(tweet._json))
+            lock.release()
+            while (len(resp) > 0):
+                print("count", counter)
+                print(len(resp))
+                max_id = resp[-1].id - 1
+                resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
+                                         max_id=max_id)
+                lock.acquire()
+                counter += 1
+                for tweet in resp:
                     if tweet.coordinates is not None:
-                        # resps.append(processTweet(tweet))
-                        num_geo_tweets += 1
                         tweets_list.append(json.dumps(tweet._json))
+                        num_geo_tweets += 1
+                    # json.dumps(tweet._json, f, indent=2)
                 lock.release()
-                while (len(resp) > 0):
-                    print("count", counter)
-                    print(len(resp))
-                    max_id = resp[-1].id - 1
-                    resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
-                                             max_id=max_id)
-                    lock.acquire()
-                    counter += 1
-                    for tweet in resp:
-                        if tweet.coordinates is not None:
-                            tweets_list.append(json.dumps(tweet._json))
-                            num_geo_tweets += 1
-                        # json.dumps(tweet._json, f, indent=2)
-                    lock.release()
 
 
     print(resps)
@@ -217,9 +220,8 @@ Stream
 
 
 class TweetListener(Stream):
-
     def on_status(self, status):
-        print(status._json)
+        print(stream)
         if status.coordinates is not None:
             tweets_list.append(json.dumps(status._json))
 
@@ -335,15 +337,15 @@ if __name__ == "__main__":
         print("start")
         t0 = threading.Thread(target=search_recent)  # 7 days
         # t1 = threading.Thread(target=search_30)
-        # t2 = threading.Thread(target=stream)
+        t2 = threading.Thread(target=stream)
         t3 = threading.Thread(target=check)
-        # threads.append(t0)
+        threads.append(t0)
         # threads.append(t1)
-        # threads.append(t2)
+        threads.append(t2)
         # threads.append(t3)
         t0.start()
         # t1.start()
-        # t2.start()
+        t2.start()
         t3.start()
 
         # t = threading.Thread(target=search_full, args=[bearer_tokens[i], labels[i], fromDate, toDate])
