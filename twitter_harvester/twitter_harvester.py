@@ -198,7 +198,7 @@ def search_recent():
                 print("count", counter)
                 print(len(resp))
                 max_id = resp[-1].id - 1
-                resp = api.search_tweets(q=query_topic, count=max_results, geocode="-37.81585,144.96313,150km",
+                resp = api.search_tweets(q=query_topic, count=max_results, geocode=geocode,
                                          max_id=max_id)
                 lock.acquire()
                 counter += 1
@@ -208,6 +208,7 @@ def search_recent():
                         num_geo_tweets += 1
                     # json.dumps(tweet._json, f, indent=2)
                 lock.release()
+        print("end in search_recent")
 
 
     print(resps)
@@ -229,6 +230,7 @@ class TweetListener(Stream):
         print(status_code)
 
     def on_connection_error(self):
+        print("connection error")
         self.disconnect()
 
 
