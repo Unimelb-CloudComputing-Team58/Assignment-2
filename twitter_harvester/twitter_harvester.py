@@ -16,11 +16,15 @@ import couchdb
 import numpy as np
 import sys
 
-area = os.environ['AREA']
-query_topic = os.environ['TOPIC']
-SERVER_PATH = os.environ["DB_SERVER"]
-DB_NAME = os.environ["DB_NAME"]
+# area = os.environ['AREA']
+# query_topic = os.environ['TOPIC']
+# SERVER_PATH = os.environ["DB_SERVER"]
+# DB_NAME = os.environ["DB_NAME"]
 
+area = 'Melbourne - Inner South'
+query_topic = 'food'
+SERVER_PATH = 'http://admin:admin@172.26.129.26:5984/'
+DB_NAME = 'test_food1_nogeo'
 # args = sys.argv
 # query_topic = None
 # area = None
@@ -41,6 +45,11 @@ print('DB_name: ',DB_NAME)
 dic_file = "area_coordinate.pkl"
 a_file = open(dic_file, "rb")
 area_coordinate_dic = pickle.load(a_file)
+a_file.close()
+
+dic_file = "area_bbxs.pkl"
+a_file = open(dic_file, "rb")
+area_bbxs = pickle.load(a_file)
 a_file.close()
 
 serach_coordinate = []
@@ -222,7 +231,7 @@ Stream
 
 class TweetListener(Stream):
     def on_status(self, status):
-        print(stream)
+        print(status.id)
         if status.coordinates is not None:
             tweets_list.append(json.dumps(status._json))
 
@@ -241,25 +250,60 @@ tweetListener = TweetListener(
 
 
 def stream():
-    tweetListener.filter(track=["{topic}".format(topic=query_topic)],
+    if area == 'Melbourne' or area == 'MEL':
+        tweetListener.filter(track=["{topic}".format(topic=query_topic)],
                          locations=[144.3336, -38.5030, 145.8784, -37.1751])
+    elif area in area_bbxs:
+        print("In ",area)
+        print("Bounding box is ",area_bbxs[area])
+        print(type(area_bbxs[area]))
+        tweetListener.filter(track=["{topic}".format(topic=query_topic)],
+                             locations=area_bbxs[area])
+        print("start stream")
+    else:
+        print('No valid area detective, running as default melbourne')
+        tweetListener.filter(track=["{topic}".format(topic=query_topic)],
+                             locations=[144.3336, -38.5030, 145.8784, -37.1751])
 
 
 def search_30():
     counter = 0
     try:
-        for page in Cursor(api.search_30_day, label="dev",
-                           query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic)).pages(1):
-            counter += 1
-            lock.acquire()
-            for tweet in page:
-                if tweet.coordinates is not None:
-                    tweets_list.append(tweet)
-                    # print(tweet.created_at, tweet.text, tweet.coordinates)
-            lock.release()
+        if area == 'Melbourne' or area == 'MEL':
+            for page in Cursor(api.search_30_day, label="dev",
+                               query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic)).pages(1):
+                counter += 1
+                lock.acquire()
+                for tweet in page:
+                    if tweet.coordinates is not None:
+                        tweets_list.append(tweet)
+                        # print(tweet.created_at, tweet.text, tweet.coordinates)
+                lock.release()
+        elif area in area_bbxs:
+            for page in Cursor(api.search_30_day, label="dev",
+                               query="bouding_box:{bbx} ({topic})".format(topic=query_topic,bbx = area_bbxs[area])).pages(1):
+                counter += 1
+                lock.acquire()
+                for tweet in page:
+                    if tweet.coordinates is not None:
+                        tweets_list.append(tweet)
+                        # print(tweet.created_at, tweet.text, tweet.coordinates)
+                lock.release()
+        else:
+            print('No valid area detective, running as default melbourne')
+            for page in Cursor(api.search_30_day, label="dev",
+                               query="place_country:Au place:Melbourne ({topic})".format(topic=query_topic)).pages(1):
+                counter += 1
+                lock.acquire()
+                for tweet in page:
+                    if tweet.coordinates is not None:
+                        tweets_list.append(tweet)
+                        # print(tweet.created_at, tweet.text, tweet.coordinates)
+                lock.release()
 
     except:
         print("requests exceed monthly maximum limit")
+
 
 
 def check():
@@ -290,16 +334,17 @@ def check():
                     if tweet['id'] not in index_dic:
                         process_tweet_list.append(tweet)
                         index_dic[tweet['id']] = 0
-
-            a_file = open(dic_file, "wb")
-            pickle.dump(index_dic, a_file)
-            a_file.close()
+            if len(dic_file) != 0:
+                a_file = open(dic_file, "wb")
+                pickle.dump(index_dic, a_file)
+                a_file.close()
             tweets_list = []
             lock.release()
-            print("couchdb ready")
-            CouchDB(SERVER_PATH, DB_NAME, process_tweet(process_tweet_list))
+            if len(process_tweet_list) != 0:
+                print("couchdb ready")
+                CouchDB(SERVER_PATH, DB_NAME, process_tweet(process_tweet_list))
 
-            print("end checking")
+                print("end checking")
 
 
 def search_full(bearerToken, label, fromDate, toDate):
@@ -341,9 +386,9 @@ if __name__ == "__main__":
         # t1 = threading.Thread(target=search_30)
         t2 = threading.Thread(target=stream)
         t3 = threading.Thread(target=check)
-        threads.append(t0)
+        # threads.append(t0)
         # threads.append(t1)
-        threads.append(t2)
+        # threads.append(t2)
         # threads.append(t3)
         t0.start()
         # t1.start()
