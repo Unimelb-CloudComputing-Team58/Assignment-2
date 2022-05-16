@@ -1,0 +1,5 @@
+curl -XPOST "http://admin:admin@172.26.134.146:5984/food/_bulk_docs" --header "Content-Type: application/json" --data @./db_food_u.json
+
+curl -XPOST "http://admin:admin@172.26.134.146:5984/park/_bulk_docs" --header "Content-Type: application/json" --data @./db_park_u.json
+
+curl -XPOST "http://admin:admin@172.26.134.146:5984/aurin/_bulk_docs" --header "Content-Type: application/json" --data @./db_aurin_income_u.json
