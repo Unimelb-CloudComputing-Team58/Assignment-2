@@ -10,4 +10,4 @@ RUN ["pip3", "install", "-r", "requirements.txt"]
 # add app
 COPY . .
 
-CMD [ "python3", "twitter_harvester.py"]
+CMD [ "python3", "tweet_harvester.py"]

@@ -16,15 +16,15 @@ import couchdb
 import numpy as np
 import sys
 
-# area = os.environ['AREA']
-# query_topic = os.environ['TOPIC']
-# SERVER_PATH = os.environ["DB_SERVER"]
-# DB_NAME = os.environ["DB_NAME"]
+area = os.environ['AREA']
+query_topic = os.environ['TOPIC']
+SERVER_PATH = os.environ["DB_SERVER"]
+DB_NAME = os.environ["DB_NAME"]
 
-area = 'Melbourne - Inner South'
-query_topic = 'food'
-SERVER_PATH = 'http://admin:admin@172.26.129.26:5984/'
-DB_NAME = 'test_food1_nogeo'
+# area = 'Melbourne - Inner South'
+# query_topic = 'food'
+# SERVER_PATH = 'http://admin:admin@172.26.129.26:5984/'
+# DB_NAME = 'test_food1_nogeo'
 # args = sys.argv
 # query_topic = None
 # area = None
