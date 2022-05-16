@@ -2,8 +2,8 @@ from flask import Flask, jsonify, abort, request, make_response, url_for, Respon
 import couchdb
 import os
 #DB_SERVER=http://admin:admin@172.26.129.26:5984/
-SERVER_PATH = "http://admin:admin@172.26.128.85:5984/"
-#SERVER_PATH = os.environ['DB_SERVER']
+#SERVER_PATH = "http://admin:admin@172.26.132.198:5984/"
+SERVER_PATH = os.environ['DB_SERVER']
 couch = couchdb.Server(SERVER_PATH)
 print(SERVER_PATH)
 areas = ["Melbourne - Inner", "Melbourne - Inner East", "Melbourne - Inner South","Melbourne - North East","Melbourne - North West",
