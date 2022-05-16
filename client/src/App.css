@@ -44,7 +44,7 @@ body {
 
 .homecomponent {
   margin-top: 30px;
-  height: 650px;
+  height: 700px;
 }
 
 .imagecontainer {
@@ -72,7 +72,13 @@ body {
 }
 
 .component {
-  height: 1500px;
+  height: 1600px;
+}
+
+.heading {
+  text-align: center;
+  margin-top: 30px;
+  color: aliceblue;
 }
 
 .component .link {
@@ -96,7 +102,6 @@ body {
 }
 
 .twomaps {
-  border: 5px solid cornflowerblue;
   margin-top: 80px;
   margin-left: 10vw;
   margin-right: 10vw;

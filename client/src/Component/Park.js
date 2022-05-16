@@ -80,6 +80,10 @@ function Park() {
       <a href="/htmls/median_household_income.html" target="_blank">Median househod income</a>
       <a href="/htmls/sa3_parks.html" target="_blank">Number of parks by SA3</a>
       </div>
+
+      <div className="heading">
+        <h1>Park</h1>
+      </div>
       <div className="chart-container">
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.num_tweets}>

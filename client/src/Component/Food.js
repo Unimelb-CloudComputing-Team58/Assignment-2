@@ -73,7 +73,9 @@ function Food() {
       </div>
 
 
-
+      <div className="heading">
+        <h1>Food</h1>
+      </div>
       <div className="chart-container">
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.num_tweets}>
@@ -157,7 +159,7 @@ function Food() {
       <div className="twomaps">
         <Map
           {...viewport}
-          style={{width: '1142px', height: '500px'}}
+          style={{width: '80vw', height: '60vh'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
           mapboxAccessToken="pk.eyJ1IjoiZnJvZ3R1bmEiLCJhIjoiY2wyOTlsdjhrMGhhaDNrbnpqNnp1eWZleSJ9.3gYSSvMmoQK0iv85aSWjEQ"
         >
