@@ -2,8 +2,8 @@ from flask import Flask, jsonify, abort, request, make_response, url_for, Respon
 import couchdb
 import os
 #DB_SERVER=http://admin:admin@172.26.129.26:5984/
-#SERVER_PATH = "http://admin:admin@172.26.129.26:5984/"
-SERVER_PATH = os.environ['DB_SERVER']
+SERVER_PATH = "http://admin:admin@172.26.128.85:5984/"
+#SERVER_PATH = os.environ['DB_SERVER']
 couch = couchdb.Server(SERVER_PATH)
 print(SERVER_PATH)
 areas = ["Melbourne - Inner", "Melbourne - Inner East", "Melbourne - Inner South","Melbourne - North East","Melbourne - North West",
@@ -13,6 +13,25 @@ areas2 = ["Inner", "Inner East", "Inner South","North East","North West",
 from flask_cors import CORS
 app = Flask(__name__, static_url_path="")
 CORS(app)
+
+db_food = None
+db_park = None
+db_aurin = None
+
+if 'food' in couch:
+    db_food = couch['food']
+else:
+    db_food = couch.create('food')
+
+if 'park' in couch:
+    db_park = couch['park']
+else:
+    db_park = couch.create('park')
+
+if 'aurin' in couch:
+    db_aurin = couch['aurin']
+else:
+    db_aurin = couch.create('aurin')
 
 
 @app.errorhandler(400)
@@ -27,10 +46,9 @@ def not_found(error):
 
 @app.route('/food', methods=['GET'])
 def get_food():
-    db = couch['food']
-    results1 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=1)
-    results2 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=2)
-    results3 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=3)
+    results1 = db_food.view('area_sentiment/get_area_sentiment', reduce=True, group_level=1)
+    results2 = db_food.view('area_sentiment/get_area_sentiment', reduce=True, group_level=2)
+    results3 = db_food.view('area_sentiment/get_area_sentiment', reduce=True, group_level=3)
     result = {}
     tweets_results = []
     for r in results1:
@@ -62,11 +80,13 @@ def get_food():
 
     coordinates = []
     for r in results3:
-        x = r.key[2][1:-1].split(',')
-        y = [float(x[0]), float(x[1])]
-        coordinates.append(y)
-    db_arin = couch['aurin']
-    results = db_arin.view('area_income/get_area_income')
+        if (type(r.key[2]) == str):
+            x = r.key[2][1:-1].split(',')
+            y = [float(x[0]), float(x[1])]
+            coordinates.append(y)
+        else:
+            coordinates.append(r.key[2])
+    results = db_aurin.view('area_income/get_area_income')
     incomes = []
     for r in results:
         dic = {}
@@ -101,10 +121,9 @@ def get_food():
 
 @app.route('/park', methods=['GET'])
 def get_park():
-    db = couch['park']
-    results1 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=1)
-    results2 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=2)
-    results3 = db.view('area_sentiment/get_area_sentiment', reduce=True, group_level=3)
+    results1 = db_park.view('area_sentiment/get_area_sentiment', reduce=True, group_level=1)
+    results2 = db_park.view('area_sentiment/get_area_sentiment', reduce=True, group_level=2)
+    results3 = db_park.view('area_sentiment/get_area_sentiment', reduce=True, group_level=3)
     result = {}
     tweets_results = []
     for r in results1:
@@ -136,11 +155,13 @@ def get_park():
 
     coordinates = []
     for r in results3:
-        x = r.key[2][1:-1].split(',')
-        y = [float(x[0]), float(x[1])]
-        coordinates.append(y)
-    db_arin = couch['aurin']
-    results = db_arin.view('area_income/get_area_income')
+        if (type(r.key[2]) == str):
+            x = r.key[2][1:-1].split(',')
+            y = [float(x[0]), float(x[1])]
+            coordinates.append(y)
+        else:
+            coordinates.append(r.key[2])
+    results = db_aurin.view('area_income/get_area_income')
     incomes = []
     for r in results:
         dic = {}
