@@ -21,21 +21,21 @@ instance_flavor: uom.mse.2c9g
 # Volume
 volumes:
   - vol_name: docker-vol-0  # for Docker
-    vol_size: 6
+    vol_size: 16
   - vol_name: docker-vol-1  # for Docker
-    vol_size: 6
+    vol_size: 16
   - vol_name: docker-vol-2  # for Docker
-    vol_size: 6
+    vol_size: 16
   - vol_name: docker-vol-3  # for Docker
-    vol_size: 6
+    vol_size: 16
   - vol_name: data-vol-0    # for data transfer, storage, or other tasks
-    vol_size: 6
+    vol_size: 64
   - vol_name: data-vol-1    # for CouchDB
-    vol_size: 6
+    vol_size: 64
   - vol_name: data-vol-2    # for CouchDB
-    vol_size: 6
+    vol_size: 64
   - vol_name: data-vol-3    # for CouchDB
-    vol_size: 6
+    vol_size: 64
 
 # Instance
 instances:
