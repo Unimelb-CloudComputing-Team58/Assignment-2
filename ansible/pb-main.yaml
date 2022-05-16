@@ -1,11 +1,24 @@
 ---
+###################################################
+#  University of Melbourne                        #
+#  COMP90024 Cluster and Cloud Computing          #
+#  2022 Semester 1 - Assignment 2                 #
+#                                                 #
+#  Team 58:                                       #
+#  - (Sam)     Bin Zhang     895427  @ Melbourne  #
+#  - (Joe)     Tianhuan Lu   894310  @ Melbourne  #
+#  - (Leo)     Yicong Li    1307323  @ Melbourne  #
+#  - (Peter)   Weiran Zou   1309198  @ Melbourne  #
+#  - (Thomas)  Chenhao Gu   1147534  @ Melbourne  #
+###################################################
+
 # Configure local host and create instances on MRC
 - hosts: localhost
   vars_files:
     - host_vars/openstack.yaml
   roles:
-    # - role: localhost-common
-    # - role: openstack-volume
+    - role: localhost-common
+    - role: openstack-volume
     - role: openstack-security-group
     - role: openstack-instance
 
@@ -14,17 +27,17 @@
   vars_files:
     - host_vars/mrc.yaml
   roles:
-    # - role: mrc-common
-    # - role: mrc-volumes
-    # - role: mrc-docker
+    - role: mrc-common
+    - role: mrc-volumes
+    - role: mrc-docker
 
 # Set up Docker Swarm
-# - name: Set up Docker Swarm
-#   import_playbook: pb-swarm.yaml
+- name: Set up Docker Swarm
+  import_playbook: pb-swarm.yaml
   
 # Create CouchDB container and set up CouchDB cluster
-# - name: Create CouchDB container and set up CouchDB cluster
-#   import_playbook: pb-couchdb.yaml
+- name: Create CouchDB container and set up CouchDB cluster
+  import_playbook: pb-couchdb.yaml
 
 # Deploy server, client and tweet harvester as Docker Swarm Service
 - hosts: swarm_leader
