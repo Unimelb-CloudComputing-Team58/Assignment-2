@@ -78,7 +78,7 @@ function Park() {
       <div className="link">
       <a href="/htmls/median_house_price.html" target="_blank">Median house price</a>
       <a href="/htmls/median_household_income.html" target="_blank">Median househod income</a>
-      <a href="/htmls/sa3_parks.html" target="_blank">Number of parks by SA3</a>
+      <a href="/htmls/sa3_parks.html" target="_blank">Number of parks</a>
       </div>
 
       <div className="heading">

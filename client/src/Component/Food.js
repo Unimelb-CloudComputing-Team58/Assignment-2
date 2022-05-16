@@ -67,9 +67,9 @@ function Food() {
 
     <div className="component">
       <div className="link">
-      <a href="/htmls/median_house_price.html" target="_blank">House price</a>
-      <a href="/htmls/median_household_income.html" target="_blank">Househod income</a>
-      <a href="/htmls/sa3_venues.html" target="_blank">Number of licenced venues by SA3 (food)</a>
+      <a href="/htmls/median_house_price.html" target="_blank">Median housing price</a>
+      <a href="/htmls/median_household_income.html" target="_blank">Median household income</a>
+      <a href="/htmls/sa3_venues.html" target="_blank">Number of licenced venues</a>
       </div>
 
 
