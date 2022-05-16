@@ -59,16 +59,16 @@ function Park() {
 
     <div className="component">
       <div className="link">
-      <a href="/htmls/median_house_price.html" target="_blank">housePrice</a>
-      <a href="/htmls/median_household_income.html" target="_blank">househod Income</a>
-      <a href="/htmls/sa3_venues.html" target="_blank">number of park/venues by sa3</a>
+      <a href="/htmls/median_house_price.html" target="_blank">Median house price</a>
+      <a href="/htmls/median_household_income.html" target="_blank">Median househod income</a>
+      <a href="/htmls/sa3_parks.html" target="_blank">Number of parks by SA3</a>
       </div>
       <div className="chart-container">
         <div className="charts">
         <BarChart width={500} height={300} data={rawdata.num_tweets}>
         <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
           <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
-          <YAxis dataKey="num_tweets" />
+          <YAxis dataKey="num_tweets" label={{value: 'TweetCount', angle: -90, position: 'insideLeft'}}/>
           <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={40} />
           <Bar name="tweet count" dataKey="num_tweets" barSize={30} fill="#7B69D9"/>
@@ -87,7 +87,7 @@ function Park() {
         >
           <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
           <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
-          <YAxis />
+          <YAxis label={{value: 'TweetCount', angle: -90, position: 'insideLeft'}}/>
           <Legend verticalAlign="top" height={40}/>
           <Tooltip cursor={false}/>
           <Bar dataKey="num_positive" fill="#2D6BCF" />
@@ -104,7 +104,7 @@ function Park() {
         <BarChart width={500} height={300} data={rawdata.incomes}>
         <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
           <XAxis dataKey="area" fontSize="10"  interval={0} angle={-12} textAnchor="end" />
-          <YAxis dataKey="income" />
+          <YAxis dataKey="income" label={{value: 'Income', angle: -90, position: 'insideLeft'}}/>
           <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={36} />
           <Bar name="Median household income vs. SA4" dataKey="income" barSize={30} fill="#4D5B7F" />
@@ -114,7 +114,7 @@ function Park() {
       <LineChart width={500} height={300} data={rawdata.relationships}>
         <CartesianGrid stroke="#eee" strokeDasharray="2 2" />
           <XAxis dataKey= "income" fontSize="10"  interval={0} angle={-9} textAnchor="end"/>
-          <YAxis />
+          <YAxis label={{value: 'Proportion', angle: -90, position: 'insideLeft'}}/>
           <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={36} />
           <Line type="monotone" dataKey="negativePercentage" stroke="#730202" />
@@ -126,7 +126,7 @@ function Park() {
       <div className="twomaps">
         <Map
           {...viewport}
-          style={{width: '1100px', height: '500px'}}
+          style={{width: '1142px', height: '500px'}}
           mapStyle="mapbox://styles/frogtuna/cl29bv18u00by14mtnwzmyga3"
           mapboxAccessToken="pk.eyJ1IjoiZnJvZ3R1bmEiLCJhIjoiY2wyOTlsdjhrMGhhaDNrbnpqNnp1eWZleSJ9.3gYSSvMmoQK0iv85aSWjEQ"
         >
