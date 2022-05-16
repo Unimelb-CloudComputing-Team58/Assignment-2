@@ -1,5 +1,0 @@
----
-- name: deploy backend as Docker Swarm service
-  community.docker.docker_swarm_service:
-    name: back_end
-    

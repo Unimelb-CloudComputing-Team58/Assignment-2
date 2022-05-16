@@ -1,0 +1,24 @@
+---
+- name: deploy (default) Tweet harvester - topic=food, area=Melbourne
+  become: true
+  community.docker.docker_swarm_service:
+    name: harvester_food_Melb
+    image: leo727268082/tweet_harvester
+    replicas: 1
+    env:
+      AREA: MEL
+      TOPIC: food
+      DB_NAME: food
+      DB_SERVER: http://{{couchdb_user}}:{{couchdb_password}}@{{dest}}:5984
+
+- name: deploy (default) Tweet harvester - topic=park, area=Melbourne
+  become: true
+  community.docker.docker_swarm_service:
+    name: harvester_park_Melb
+    image: leo727268082/tweet_harvester
+    replicas: 1
+    env:
+      AREA: MEL
+      TOPIC: park
+      DB_NAME: park
+      DB_SERVER: http://{{couchdb_user}}:{{couchdb_password}}@{{dest}}:5984

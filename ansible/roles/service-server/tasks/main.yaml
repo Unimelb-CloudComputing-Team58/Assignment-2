@@ -1,0 +1,13 @@
+---
+- name: deploy server (back-end)
+  become: true
+  community.docker.docker_swarm_service:
+    name: server
+    image: leo727268082/server
+    replicas: 2
+    publish:
+      - mode: ingress
+        published_port: 5000
+        target_port: 5000
+    env:
+      DB_SERVER: http://{{couchdb_user}}:{{couchdb_password}}@{{dest}}:5984

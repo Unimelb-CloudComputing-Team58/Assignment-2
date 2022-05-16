@@ -1,4 +1,0 @@
----
-couchdb_user: admin
-couchdb_password: admin
-couchdb_coordinator: "{{ groups['couchdb_coordinator'][0] }}"

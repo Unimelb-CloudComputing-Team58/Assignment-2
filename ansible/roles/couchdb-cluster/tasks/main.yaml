@@ -1,7 +1,7 @@
 ---
 - name: Enable CouchDB cluster
   ansible.builtin.uri:
-    url: http://{{ couchdb_coordinator }}:5984/_cluster_setup
+    url: http://{{ coordinator }}:5984/_cluster_setup
     method: POST
     user: "{{ couchdb_user }}"
     password: "{{ couchdb_password }}"
@@ -23,7 +23,7 @@
 
 - name: Add nodes to CouchDB cluster
   ansible.builtin.uri:
-    url: http://{{ couchdb_coordinator }}:5984/_cluster_setup
+    url: http://{{ coordinator }}:5984/_cluster_setup
     method: POST
     user: "{{ couchdb_user }}"
     password: "{{ couchdb_password }}"
@@ -41,7 +41,7 @@
 
 - name: Test connection
   ansible.builtin.uri:
-    url: http://{{ couchdb_coordinator }}:5984/
+    url: http://{{ coordinator }}:5984/
     method: GET
     user: "{{ couchdb_user }}"
     password: "{{ couchdb_password }}"
@@ -50,7 +50,7 @@
 
 - name: Finish CouchDB cluster setup
   ansible.builtin.uri:
-    url: http://{{ couchdb_coordinator }}:5984/_cluster_setup
+    url: http://{{ coordinator }}:5984/_cluster_setup
     method: POST
     user: "{{ couchdb_user }}"
     password: "{{ couchdb_password }}"

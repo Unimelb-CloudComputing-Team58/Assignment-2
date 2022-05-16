@@ -19,23 +19,25 @@
   become: true
   vars_files:
     - host_vars/mrc.yaml
+  vars:
+    leader_IP: "{{ groups['swarm_leader'][0] }}"
   tasks:
     - name: add managers to swarm
       community.docker.docker_swarm:
         state: join
-        join_token: "{{ hostvars[ item ]['manager_token'] }}"
-        remote_addrs: "{{ item }}:2377"
-      loop: "{{ groups['swarm_leader'] }}"
+        join_token: "{{ hostvars[ leader_IP ]['manager_token'] }}"
+        remote_addrs: "{{ leader_IP }}:2377"
 
 # Add workers to Docker Swarm
 - hosts: swarm_worker
   become: true
   vars_files:
     - host_vars/mrc.yaml
+  vars:
+    leader_IP: "{{ groups['swarm_leader'][0] }}"
   tasks:
     - name: add workers to swarm
       community.docker.docker_swarm:
         state: join
-        join_token: "{{ hostvars[ item ]['worker_token'] }}"
-        remote_addrs: "{{ item }}:2377"
-      loop: "{{ groups['swarm_leader'] }}"
+        join_token: "{{ hostvars[ leader_IP ]['worker_token'] }}"
+        remote_addrs: "{{ leader_IP }}:2377"

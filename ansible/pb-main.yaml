@@ -4,8 +4,8 @@
   vars_files:
     - host_vars/openstack.yaml
   roles:
-    - role: localhost-common
-    - role: openstack-volume
+    # - role: localhost-common
+    # - role: openstack-volume
     - role: openstack-security-group
     - role: openstack-instance
 
@@ -14,25 +14,26 @@
   vars_files:
     - host_vars/mrc.yaml
   roles:
-    - role: mrc-common
-    - role: mrc-volumes
-    - role: mrc-docker
+    # - role: mrc-common
+    # - role: mrc-volumes
+    # - role: mrc-docker
 
 # Set up Docker Swarm
-- name: Set up Docker Swarm
-  import_playbook: pb-swarm.yaml
+# - name: Set up Docker Swarm
+#   import_playbook: pb-swarm.yaml
   
 # Create CouchDB container and set up CouchDB cluster
-- name: Create CouchDB container and set up CouchDB cluster
-  import_playbook: pb-couchdb.yaml
+# - name: Create CouchDB container and set up CouchDB cluster
+#   import_playbook: pb-couchdb.yaml
 
-# Deploy back & front end and Twitter harvester as Docker Swarm Service
+# Deploy server, client and tweet harvester as Docker Swarm Service
 - hosts: swarm_leader
-  become: true
   vars_files:
     - host_vars/mrc.yaml
+    - host_vars/couchdb.yaml
+  vars:
+    dest: "{{ groups['couchdb_node'][0] }}"
   roles:
-    # - role: service-back-end
-    # - role: service-front-end
-    # - role: service-harvester
-
+    - role: service-server
+    - role: service-client
+    - role: service-harvester

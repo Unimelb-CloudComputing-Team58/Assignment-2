@@ -35,8 +35,8 @@
 # - MRC instance 3 is a worker.
 # managers are also workers in this setup
 #
-# CouchDB will be set up on instances 1, 2 and 3
-# for convenience, instance 3 will be the coordinator for the setup
+# CouchDB is set up on instances 1, 2 and 3
+# for convenience, instance 3 is the coordinator for the setup
 
 - name: add instance 0 to hosts as the Swarm leader 
   ansible.builtin.add_host:
@@ -48,7 +48,7 @@
     name: "{{ item }}"
     groups:
       - swarm_manager
-      - couchdb_nodes
+      - couchdb_node
   loop: "{{ [1,2] | map('extract', IPs) | list }}"
 
 - name: add instance 3 to hosts as Swarm worker and CouchDB coordinator

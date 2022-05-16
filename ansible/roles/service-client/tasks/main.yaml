@@ -1,0 +1,13 @@
+---
+- name: deploy client (front-end)
+  become: true
+  community.docker.docker_swarm_service:
+    name: client
+    image: leo727268082/client
+    replicas: 2
+    publish:
+      - mode: ingress
+        published_port: 3000
+        target_port: 3000
+    env:
+      REACT_APP_URL: http://{{dest}}:5000

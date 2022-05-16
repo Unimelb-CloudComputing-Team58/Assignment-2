@@ -6,42 +6,42 @@ instance_flavor: uom.mse.2c9g
 
 # Volume
 volumes:
-  - vol_name: docker-vol-0
-    vol_size: 5
-  - vol_name: docker-vol-1
-    vol_size: 5
-  - vol_name: docker-vol-2
-    vol_size: 5
-  - vol_name: docker-vol-3
-    vol_size: 5
-  - vol_name: data-vol-0
-    vol_size: 5
-  - vol_name: data-vol-1
-    vol_size: 5
-  - vol_name: data-vol-2
-    vol_size: 5
-  - vol_name: data-vol-3
-    vol_size: 5
+  - vol_name: docker-vol-0  # for Docker
+    vol_size: 6
+  - vol_name: docker-vol-1  # for Docker
+    vol_size: 6
+  - vol_name: docker-vol-2  # for Docker
+    vol_size: 6
+  - vol_name: docker-vol-3  # for Docker
+    vol_size: 6
+  - vol_name: data-vol-0    # for data transfer, storage, or other tasks
+    vol_size: 6
+  - vol_name: data-vol-1    # for CouchDB
+    vol_size: 6
+  - vol_name: data-vol-2    # for CouchDB
+    vol_size: 6
+  - vol_name: data-vol-3    # for CouchDB
+    vol_size: 6
 
 # Instance
 instances:
-  - name: i0
+  - name: ins-0
     volumes: [docker-vol-0, data-vol-0]
-  - name: i1
+  - name: ins-1
     volumes: [docker-vol-1, data-vol-1]
-  - name: i2
+  - name: ins-2
     volumes: [docker-vol-2, data-vol-2]
-  - name: i3
+  - name: ins-3
     volumes: [docker-vol-3, data-vol-3]
 
 # Security group
 security_groups:
   - name: sg-admin
-    description: "Security group to allow for SSH, HTTP or front end access"
+    description: "Security group to allow for genearl admin and API access"
   - name: sg-couch-db
-    description: "Security group for communication between CouchDB nodes in cluster"
+    description: "Security group for CouchDB cluster"
   - name: sg-docker-swarm
-    description: "Security group for docker swarm"
+    description: "Security group for Docker Swarm"
 
 security_group_rules_public:
   - name: sg-admin
@@ -61,12 +61,17 @@ security_group_rules_public:
     remote_ip_prefix: 0.0.0.0/0
   - name: sg-admin
     protocol: tcp
-    port_range_min: 10000
-    port_range_max: 10000
+    port_range_min: 5000
+    port_range_max: 5000
+    remote_ip_prefix: 0.0.0.0/0
+  - name: sg-admin
+    protocol: tcp
+    port_range_min: 3000
+    port_range_max: 3000
     remote_ip_prefix: 0.0.0.0/0
 
-# security groups for CoucheDB 
 security_group_rules_private: 
+  # CoucheDB 
   - name: sg-couch-db
     protocol: tcp
     port_range_min: 5984
@@ -82,8 +87,7 @@ security_group_rules_private:
     port_range_min: 9100
     port_range_max: 9200
     remote_group: sg-couch-db
-  
-  # docker swarm
+  # Docker Swarm
   - name: sg-docker-swarm
     protocol: tcp
     port_range_min: 2377
@@ -91,13 +95,13 @@ security_group_rules_private:
     remote_group: sg-docker-swarm
   - name: sg-docker-swarm
     protocol: tcp
-    port_range_min: 7496
-    port_range_max: 7496
+    port_range_min: 7946
+    port_range_max: 7946
     remote_group: sg-docker-swarm
   - name: sg-docker-swarm
     protocol: udp
-    port_range_min: 7496
-    port_range_max: 7496
+    port_range_min: 7946
+    port_range_max: 7946
     remote_group: sg-docker-swarm
   - name: sg-docker-swarm
     protocol: udp

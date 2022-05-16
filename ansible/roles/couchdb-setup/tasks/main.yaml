@@ -3,7 +3,7 @@
   become: true
   community.docker.docker_container:
     name: couchdb
-    image: "couchdb:{{ couchdb_version }}"
+    image: couchdb:{{ couchdb_version }}
     state: started
     recreate: true
     ports:
