@@ -72,8 +72,8 @@ function Park() {
           <Tooltip cursor={false}/>
           <Legend verticalAlign="top" height={40} />
           <Bar name="tweet count" dataKey="num_tweets" barSize={30} fill="#7B69D9"/>
-
         </BarChart>
+        <h6>Area</h6>
       </div>
 
 
@@ -94,6 +94,7 @@ function Park() {
           <Bar dataKey="num_neutral" fill="#068E04" />
           <Bar dataKey="num_negative" fill="#EC4817" />
         </BarChart>
+        <h6>Area</h6>
       </div>
 
 
@@ -109,6 +110,7 @@ function Park() {
           <Legend verticalAlign="top" height={36} />
           <Bar name="Median household income vs. SA4" dataKey="income" barSize={30} fill="#4D5B7F" />
         </BarChart>
+        <h6>Area</h6>
       </div>
       <div className="charts">
       <LineChart width={500} height={300} data={rawdata.relationships}>
@@ -120,6 +122,7 @@ function Park() {
           <Line type="monotone" dataKey="negativePercentage" stroke="#730202" />
           <Line type="monotone" dataKey="positivePercentage" stroke="#00681B" />
         </LineChart>
+        <h6>Income</h6>
       </div>
       </div>
 
